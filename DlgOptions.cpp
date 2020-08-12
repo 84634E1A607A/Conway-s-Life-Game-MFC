@@ -40,11 +40,12 @@ BEGIN_MESSAGE_MAP(DlgOptions, CDialogEx)
 	ON_EN_CHANGE(IDC_SCALE, &DlgOptions::OnChangeScale)
 	ON_BN_CLICKED(IDC_STARTSTOP, &DlgOptions::OnBnClickedStartstop)
 	ON_BN_CLICKED(IDC_RESET, &DlgOptions::OnBnClickedReset)
-	ON_BN_CLICKED(IDC_OK, &DlgOptions::OnBnClickedOk)
 	ON_BN_CLICKED(IDC_UP, &DlgOptions::OnBnClickedUp)
 	ON_BN_CLICKED(IDC_DOWN, &DlgOptions::OnBnClickedDown)
 	ON_BN_CLICKED(IDC_LEFT, &DlgOptions::OnBnClickedLeft)
 	ON_BN_CLICKED(IDC_RIGHT, &DlgOptions::OnBnClickedRight)
+	ON_EN_CHANGE(IDC_XPIVOT, &DlgOptions::OnChangeXpivot)
+	ON_EN_CHANGE(IDC_YPIVOT, &DlgOptions::OnChangeYpivot)
 END_MESSAGE_MAP()
 
 
@@ -77,13 +78,13 @@ BOOL DlgOptions::OnInitDialog()
 	pScale->SendMessage(EM_SETLIMITTEXT, 3, 0);
 	pScale->SendMessage(WM_SETTEXT, 0, (LPARAM)L"10");
 
-	CWnd* pSetX = GetDlgItem(IDC_SX);
+	CWnd* pSetX = GetDlgItem(IDC_XPIVOT);
 	pSetX->SendMessage(EM_SETLIMITTEXT, 10, 0);
-	pSetX->SendMessage(WM_SETTEXT, 0, (LPARAM)L"0x08000000");
+	pSetX->SendMessage(WM_SETTEXT, 0, (LPARAM)L"08000000");
 
-	CWnd* pSetY = GetDlgItem(IDC_SY);
+	CWnd* pSetY = GetDlgItem(IDC_YPIVOT);
 	pSetY->SendMessage(EM_SETLIMITTEXT, 10, 0);
-	pSetY->SendMessage(WM_SETTEXT, 0, (LPARAM)L"0x08000000");
+	pSetY->SendMessage(WM_SETTEXT, 0, (LPARAM)L"08000000");
 
 	GetDlgItem(IDC_HEADPOOL_SIZE)->SendMessage(WM_SETTEXT, 0, (LPARAM)map.get_size());
 
@@ -99,7 +100,7 @@ BOOL DlgOptions::OnInitDialog()
 void DlgOptions::OnChangeBuiltin()
 {
 	WCHAR val[16];
-	GetDlgItem(IDC_BUILTIN)->GetWindowText(val, 16);
+	GetDlgItemText(IDC_BUILTIN, val, 16);
 	selected_builtin = _wtoi(val);
 	map.draw_builtin(this);
 }
@@ -108,7 +109,7 @@ void DlgOptions::OnChangeBuiltin()
 void DlgOptions::OnChangeDirection()
 {
 	WCHAR val[16];
-	GetDlgItem(IDC_DIRECTION)->GetWindowText(val, 16);
+	GetDlgItemText(IDC_DIRECTION, val, 16);
 	selected_direction = _wtoi(val);
 	map.draw_builtin(this);
 }
@@ -117,10 +118,9 @@ void DlgOptions::OnChangeDirection()
 void DlgOptions::OnChangeTimer()
 {
 	WCHAR val[16];
-	CWnd* pTimer = GetDlgItem(IDC_TIMER);
-	pTimer->GetWindowText(val, 16);
+	GetDlgItemText(IDC_TIMER, val, 16);
 	int v = _wtoi(val);
-	if (v <= 0) pTimer->SendMessage(WM_SETTEXT, 0, (LPARAM)L"1");
+	if (v <= 0) SetDlgItemText(IDC_TIMER, L"1");
 	else {
 		TIMER = v;
 		theApp.m_pMainWnd->SetTimer(1, TIMER, NULL);
@@ -131,10 +131,9 @@ void DlgOptions::OnChangeTimer()
 void DlgOptions::OnChangeScale()
 {
 	WCHAR val[16];
-	CWnd* pScale = GetDlgItem(IDC_SCALE);
-	pScale->GetWindowText(val, 16);
+	GetDlgItemText(IDC_SCALE, val, 16);
 	int v = _wtoi(val);
-	if (v <= 2) pScale->SendMessage(WM_SETTEXT, 0, (LPARAM)L"3");
+	if (v <= 2) SetDlgItemText(IDC_SCALE, L"3");
 	else side_length = v, redraw_erase();
 }
 
@@ -150,39 +149,6 @@ void DlgOptions::OnBnClickedReset()
 	xpivot = ypivot = 0x08000000;
 	started = false;
 	map.clear();
-}
-
-void DlgOptions::OnBnClickedOk()
-{
-	WCHAR xstr[16], ystr[16];
-	int x = 0, y = 0;
-	CWnd* pXPivot = GetDlgItem(IDC_XPIVOT);
-	CWnd* pYPivot = GetDlgItem(IDC_YPIVOT);
-	CWnd* pSetX = GetDlgItem(IDC_SX);
-	CWnd* pSetY = GetDlgItem(IDC_SY);
-	pSetX->GetWindowText(xstr, 16);
-	pSetY->GetWindowText(ystr, 16);
-	swscanf_s(xstr, L"0x%08x", &x);
-	swscanf_s(ystr, L"0x%08x", &y);
-	swprintf_s(xstr, 16, L"0x%08x", x);
-	swprintf_s(ystr, 16, L"0x%08x", y);
-	if (x > 0) {
-		xpivot = x;
-		change_xpivot();
-	}
-	else {
-		GetDlgItemText(IDC_XPIVOT, xstr, 16);
-		pSetX->SendMessage(WM_SETTEXT, 0, (LPARAM)xstr);
-	}
-	if (y > 0) {
-		ypivot = y;
-		change_ypivot();
-	}
-	else {
-		GetDlgItemText(IDC_YPIVOT, ystr, 16);
-		pSetY->SendMessage(WM_SETTEXT, 0, (LPARAM)ystr);
-	}
-	redraw_erase();
 }
 
 
@@ -215,4 +181,48 @@ void DlgOptions::OnBnClickedRight()
 	xpivot += 5 * move_length / side_length;
 	redraw_erase();
 	change_xpivot();
+}
+
+
+void DlgOptions::OnChangeXpivot()
+{
+	WCHAR xstr[16];
+	GetDlgItemText(IDC_XPIVOT, xstr, 16);
+	int len = lstrlen(xstr);
+	for (int i = 0; i < len; i++)
+		if (!((xstr[i] >= L'0' && xstr[i] <= L'9') || (xstr[i] >= L'a' && xstr[i] <= L'f'))) {
+			MessageBox(L"X Pivot should be a value ranged (0, 0x10000000)", L"Error", MB_OK);
+			return change_xpivot();
+		}
+	unsigned int x = wcstol(xstr, nullptr, 16);
+	if (x < 0x10000000 && x > 0) {
+		if (xpivot == x && len == 8) return;
+		xpivot = x;
+	}
+	else {
+		MessageBox(L"X Pivot should be a value ranged (0, 0x10000000)", L"Error", MB_OK);
+	}
+	change_xpivot(), redraw_erase();
+}
+
+
+void DlgOptions::OnChangeYpivot()
+{
+	WCHAR ystr[16];
+	GetDlgItemText(IDC_YPIVOT, ystr, 16);
+	int len = lstrlen(ystr);
+	for (int i = 0; i < len; i++)
+		if (!((ystr[i] >= L'0' && ystr[i] <= L'9') || (ystr[i] >= L'a' && ystr[i] <= L'f'))) {
+			MessageBox(L"Y Pivot should be a value ranged (0, 0x10000000)", L"Error", MB_OK);
+			return change_ypivot();
+		}
+	unsigned int y = wcstol(ystr, nullptr, 16);
+	if (y < 0x10000000 && y > 0) {
+		if (ypivot == y && len == 8) return;
+		ypivot = y;
+	}
+	else {
+		MessageBox(L"Y Pivot should be a value ranged (0, 0x10000000)", L"Error", MB_OK);
+	}
+	change_ypivot(), redraw_erase();
 }

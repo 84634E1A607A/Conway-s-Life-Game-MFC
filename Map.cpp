@@ -26,13 +26,13 @@ inline void redraw_erase() {
 
 inline void change_xpivot() {
 	WCHAR xpivot_c[16];
-	wsprintf(xpivot_c, L"0x%08x", xpivot);
+	wsprintf(xpivot_c, L"%08x", xpivot);
 	theDlg.GetDlgItem(IDC_XPIVOT)->SendMessage(WM_SETTEXT, 0, (LPARAM)xpivot_c);
 }
 
 inline void change_ypivot() {
 	WCHAR ypivot_c[16];
-	wsprintf(ypivot_c, L"0x%08x", ypivot);
+	wsprintf(ypivot_c, L"%08x", ypivot);
 	theDlg.GetDlgItem(IDC_YPIVOT)->SendMessage(WM_SETTEXT, 0, (LPARAM)ypivot_c);
 }
 
