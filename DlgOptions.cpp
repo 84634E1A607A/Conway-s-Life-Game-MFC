@@ -40,6 +40,11 @@ BEGIN_MESSAGE_MAP(DlgOptions, CDialogEx)
 	ON_EN_CHANGE(IDC_SCALE, &DlgOptions::OnChangeScale)
 	ON_BN_CLICKED(IDC_STARTSTOP, &DlgOptions::OnBnClickedStartstop)
 	ON_BN_CLICKED(IDC_RESET, &DlgOptions::OnBnClickedReset)
+	ON_BN_CLICKED(IDC_OK, &DlgOptions::OnBnClickedOk)
+	ON_BN_CLICKED(IDC_UP, &DlgOptions::OnBnClickedUp)
+	ON_BN_CLICKED(IDC_DOWN, &DlgOptions::OnBnClickedDown)
+	ON_BN_CLICKED(IDC_LEFT, &DlgOptions::OnBnClickedLeft)
+	ON_BN_CLICKED(IDC_RIGHT, &DlgOptions::OnBnClickedRight)
 END_MESSAGE_MAP()
 
 
@@ -71,6 +76,14 @@ BOOL DlgOptions::OnInitDialog()
 	CWnd* pScale = GetDlgItem(IDC_SCALE);
 	pScale->SendMessage(EM_SETLIMITTEXT, 3, 0);
 	pScale->SendMessage(WM_SETTEXT, 0, (LPARAM)L"10");
+
+	CWnd* pSetX = GetDlgItem(IDC_SX);
+	pSetX->SendMessage(EM_SETLIMITTEXT, 10, 0);
+	pSetX->SendMessage(WM_SETTEXT, 0, (LPARAM)L"0x08000000");
+
+	CWnd* pSetY = GetDlgItem(IDC_SY);
+	pSetY->SendMessage(EM_SETLIMITTEXT, 10, 0);
+	pSetY->SendMessage(WM_SETTEXT, 0, (LPARAM)L"0x08000000");
 
 	GetDlgItem(IDC_HEADPOOL_SIZE)->SendMessage(WM_SETTEXT, 0, (LPARAM)map.get_size());
 
@@ -137,4 +150,69 @@ void DlgOptions::OnBnClickedReset()
 	xpivot = ypivot = 0x08000000;
 	started = false;
 	map.clear();
+}
+
+void DlgOptions::OnBnClickedOk()
+{
+	WCHAR xstr[16], ystr[16];
+	int x = 0, y = 0;
+	CWnd* pXPivot = GetDlgItem(IDC_XPIVOT);
+	CWnd* pYPivot = GetDlgItem(IDC_YPIVOT);
+	CWnd* pSetX = GetDlgItem(IDC_SX);
+	CWnd* pSetY = GetDlgItem(IDC_SY);
+	pSetX->GetWindowText(xstr, 16);
+	pSetY->GetWindowText(ystr, 16);
+	swscanf_s(xstr, L"0x%08x", &x);
+	swscanf_s(ystr, L"0x%08x", &y);
+	swprintf_s(xstr, 16, L"0x%08x", x);
+	swprintf_s(ystr, 16, L"0x%08x", y);
+	if (x > 0) {
+		xpivot = x;
+		change_xpivot();
+	}
+	else {
+		GetDlgItemText(IDC_XPIVOT, xstr, 16);
+		pSetX->SendMessage(WM_SETTEXT, 0, (LPARAM)xstr);
+	}
+	if (y > 0) {
+		ypivot = y;
+		change_ypivot();
+	}
+	else {
+		GetDlgItemText(IDC_YPIVOT, ystr, 16);
+		pSetY->SendMessage(WM_SETTEXT, 0, (LPARAM)ystr);
+	}
+	redraw_erase();
+}
+
+
+void DlgOptions::OnBnClickedUp()
+{
+	ypivot -= 5 * move_length / side_length;
+	redraw_erase();
+	change_ypivot();
+}
+
+
+void DlgOptions::OnBnClickedDown()
+{
+	ypivot += 5 * move_length / side_length;
+	redraw_erase();
+	change_ypivot();
+}
+
+
+void DlgOptions::OnBnClickedLeft()
+{
+	xpivot -= 5 * move_length / side_length;
+	redraw_erase();
+	change_xpivot();
+}
+
+
+void DlgOptions::OnBnClickedRight()
+{
+	xpivot += 5 * move_length / side_length;
+	redraw_erase();
+	change_xpivot();
 }

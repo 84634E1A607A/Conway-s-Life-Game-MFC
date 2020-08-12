@@ -29,6 +29,11 @@ public:
 	afx_msg void OnChangeScale();
 	afx_msg void OnBnClickedStartstop();
 	afx_msg void OnBnClickedReset();
+	afx_msg void OnBnClickedOk();
+	afx_msg void OnBnClickedUp();
+	afx_msg void OnBnClickedDown();
+	afx_msg void OnBnClickedLeft();
+	afx_msg void OnBnClickedRight();
 };
 
 extern DlgOptions theDlg;
