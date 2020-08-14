@@ -13,6 +13,7 @@ inline void change_ypivot();
 class Map {
 public:
 	Map();
+	~Map();
 	void change(unsigned int xpos, unsigned int ypos, int type = 0);
 	void calc();
 	void clear();
@@ -30,6 +31,10 @@ private:
 		bool state;
 		BYTE count;
 		node* pnext;
+#ifdef DEBUG
+		unsigned int id;
+#endif // DEBUG
+
 	};
 
 	struct head {

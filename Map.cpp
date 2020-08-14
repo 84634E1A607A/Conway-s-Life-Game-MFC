@@ -15,7 +15,7 @@ extern DlgOptions theDlg;
 
 
 #ifdef DEBUG
-unsigned int insert_count, del_count, waste_count;
+unsigned int insert_count, del_count, id;
 #endif
 
 inline void redraw_erase() {
@@ -37,6 +37,10 @@ inline void change_ypivot() {
 }
 
 Map::Map() {
+#ifdef DEBUG
+	head_pool = new head, node_pool = new node;
+	cur.pnext = pre.pnext = nxt.pnext = nullptr;
+#else // DEBUG
 	head_pool = new Map::head[SIZE];
 	node_pool = new Map::node[SIZE];
 	memset(head_pool, 0, SIZE * sizeof(Map::head));
@@ -45,6 +49,7 @@ Map::Map() {
 	for (int i = 0; i < SIZE; i++) (node_pool + i)->pnext = node_pool + i + 1;
 	(head_pool + SIZE - 1)->pnext = nullptr;  (node_pool + SIZE - 1)->pnext = nullptr;
 	cur.pnext = nullptr;
+#endif
 	phead_pools = { head_pool, nullptr, nullptr };
 	pnode_pools = { nullptr, node_pool, nullptr };
 	init_builtins();
@@ -94,10 +99,7 @@ void Map::calc() {
 	px = nxt.pnext;
 	while (px) {
 		Map::node* py = px->pnode->pnext;
-		for (; py; py = py->pnext) {
-			if (py->count == 3) change(px->x, py->y);
-			else if (py->state && py->count == 4) change(px->x, py->y);
-		}
+		for (; py; py = py->pnext) if ((py->count == 3) || py->state && py->count == 4) change(px->x, py->y);
 		px = px->pnext;
 	}
 	clear(&nxt);
@@ -105,12 +107,19 @@ void Map::calc() {
 
 void Map::clear() {
 	Sleep(TIMER);
+#ifdef DEBUG
+	clear(&pre);
+	clear(&cur);
+	cur.pnext = nullptr, nxt.pnext = nullptr, pre.pnext = nullptr, ppre = nullptr;
+	redraw_erase();
+#else
 	memset(head_pool, 0, SIZE * sizeof(Map::head));
 	memset(node_pool, 0, SIZE * sizeof(Map::node));
 	for (int i = 0; i < SIZE; i++) (head_pool + i)->pnext = head_pool + i + 1;
 	for (int i = 0; i < SIZE; i++) (node_pool + i)->pnext = node_pool + i + 1;
 	(head_pool + SIZE - 1)->pnext = nullptr;  (node_pool + SIZE - 1)->pnext = nullptr;
 	cur.pnext = nullptr, nxt.pnext = nullptr, pre.pnext = nullptr, ppre = nullptr;
+	
 	redraw_erase();
 
 	ppool* phead = phead_pools.pnext, * pdel = phead;
@@ -130,6 +139,7 @@ void Map::clear() {
 		pdel = pnode;
 	}
 	pnode_pools.pnext = nullptr;
+#endif
 
 	headpool_usage = nodepool_usage = 1;
 	refresh_headpool_usage(), refresh_nodepool_usage();
@@ -406,7 +416,15 @@ inline void Map::refresh_nodepool_usage() {
 Map::head* Map::insert(Map::head* p) {
 #ifdef DEBUG
 	insert_count++;
-#endif // DEBUG
+	head* pn = new head;
+	pn->pnext = p->pnext;
+	p->pnext = pn;
+	node* pnode = new node;
+	pn->pnode = pnode;
+	memset(pnode, 0, sizeof(node));
+	pnode->id = id++;
+	return pn;
+#else // DEBUG
 	Map::head* pn = head_pool->pnext ? head_pool->pnext : enlarge_head_pool();
 	head_pool->pnext = pn->pnext;
 	pn->pnext = p->pnext;
@@ -417,36 +435,50 @@ Map::head* Map::insert(Map::head* p) {
 	pn->pnode = pnode;
 	pnode->pnext = nullptr;
 	return pn;
+#endif
 }
 
 Map::node* Map::insert(Map::node* p) {
 #ifdef DEBUG
 	insert_count++;
-#endif // DEBUG
+	node* pn = new node;
+	memset(pn, 0, sizeof(node));
+	pn->pnext = p->pnext;
+	p->pnext = pn;
+	pn->id = id++;
+	return pn;
+#else // DEBUG
 	Map::node* pn = node_pool->pnext ? node_pool->pnext : enlarge_node_pool();
 	node_pool->pnext = pn->pnext;
 	pn->pnext = p->pnext;
 	p->pnext = pn;
 	return pn;
+#endif
 }
 
 void Map::del(Map::node* p) {
 #ifdef DEBUG
 	del_count++;
-#endif // DEBUG
+	node* pd = p->pnext;
+	p->pnext = pd->pnext;
+	delete pd;
+#else // DEBUG
 	Map::node* pd = p->pnext;
 	p->pnext = pd->pnext;
 	pd->pnext = node_pool->pnext;
 	node_pool->pnext = pd;
 	pd->count = pd->state = pd->y = 0;
+#endif
 }
 
 void Map::del(Map::head* h) {
 #ifdef DEBUG
 	del_count++;
-	if (h->pnext->pnode->pnext)
-		waste_count++;
-#endif // DEBUG
+	head* pd = h->pnext;
+	delete pd->pnode;
+	h->pnext = pd->pnext;
+	delete pd;
+#else // DEBUG
 	Map::head* pd = h->pnext;
 
 	Map::node* pdn = pd->pnode;
@@ -459,9 +491,13 @@ void Map::del(Map::head* h) {
 	pd->pnext = head_pool->pnext;
 	head_pool->pnext = pd;
 	pd->x = 0;
+#endif
 }
 
 void Map::add(unsigned int xpos, unsigned int ypos) {
+#ifdef DEBUG
+	ppre = nullptr;
+#endif
 	if (!ppre) ppre = &nxt;
 	Map::head* px = &nxt;
 	if (ppre->pnext && ppre->pnext->x <= xpos) px = ppre;
@@ -582,6 +618,32 @@ void Map::init_builtins() {
 	builtins[3].size = 24;
 	builtins[3].length = 13;
 	builtins[3].height = 13;
+}
+
+Map::~Map() {
+#ifdef DEBUG
+	clear(&pre);
+	clear(&cur);
+	delete phead_pools.phead;
+	delete pnode_pools.pnode;
+#else // DEBUG
+	ppool* phead = phead_pools.pnext, * pdel = phead;
+	while (phead != nullptr) {
+		delete[] phead->phead;
+		phead = phead->pnext;
+		delete pdel;
+		pdel = phead;
+	}
+	ppool* pnode = pnode_pools.pnext; pdel = pnode;
+	while (pnode != nullptr) {
+		delete[] pnode->pnode;
+		pnode = pnode->pnext;
+		delete pdel;
+		pdel = pnode;
+	}
+	delete[] phead_pools.phead;
+	delete[] pnode_pools.pnode;
+#endif
 }
 
 Map map;
