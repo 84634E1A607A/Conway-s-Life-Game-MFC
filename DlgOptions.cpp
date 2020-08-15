@@ -86,10 +86,13 @@ BOOL DlgOptions::OnInitDialog()
 	pSetY->SendMessage(EM_SETLIMITTEXT, 10, 0);
 	pSetY->SendMessage(WM_SETTEXT, 0, (LPARAM)L"08000000");
 
-	GetDlgItem(IDC_HEADPOOL_SIZE)->SendMessage(WM_SETTEXT, 0, (LPARAM)map.get_size());
-
-	GetDlgItem(IDC_NODEPOOL_SIZE)->SendMessage(WM_SETTEXT, 0, (LPARAM)map.get_size());
-
+#ifdef DEBUG
+	SetDlgItemText(IDC_HEADPOOL_SIZE, L"0");
+	SetDlgItemText(IDC_NODEPOOL_SIZE, L"0");
+#else // DEBUG
+	SetDlgItemText(IDC_HEADPOOL_SIZE, map.get_size());
+	SetDlgItemText(IDC_NODEPOOL_SIZE, map.get_size());
+#endif
 	CloseHandle(CreateThread(NULL, 0, draw_first_builtin, this, 0, NULL));
 
 	return TRUE;  // return TRUE unless you set the focus to a control

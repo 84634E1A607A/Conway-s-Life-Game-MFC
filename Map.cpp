@@ -15,7 +15,7 @@ extern DlgOptions theDlg;
 
 
 #ifdef DEBUG
-unsigned int insert_count, del_count, id;
+unsigned int insert_count, del_count, id, head_count, node_count;
 #endif
 
 inline void redraw_erase() {
@@ -111,6 +111,9 @@ void Map::clear() {
 	clear(&pre);
 	clear(&cur);
 	cur.pnext = nullptr, nxt.pnext = nullptr, pre.pnext = nullptr, ppre = nullptr;
+	head_count = node_count = 0;
+	theDlg.SetDlgItemText(IDC_HEADPOOL_USAGE, L"0");
+	theDlg.SetDlgItemText(IDC_NODEPOOL_USAGE, L"0");
 	redraw_erase();
 #else
 	memset(head_pool, 0, SIZE * sizeof(Map::head));
@@ -423,6 +426,13 @@ Map::head* Map::insert(Map::head* p) {
 	pn->pnode = pnode;
 	memset(pnode, 0, sizeof(node));
 	pnode->id = id++;
+	head_count++;
+	WCHAR c[16];
+	_itow_s(head_count, c, 10);
+	theDlg.SetDlgItemText(IDC_HEADPOOL_USAGE, c);
+	node_count++;
+	_itow_s(node_count, c, 10);
+	theDlg.SetDlgItemText(IDC_NODEPOOL_USAGE, c);
 	return pn;
 #else // DEBUG
 	Map::head* pn = head_pool->pnext ? head_pool->pnext : enlarge_head_pool();
@@ -446,6 +456,10 @@ Map::node* Map::insert(Map::node* p) {
 	pn->pnext = p->pnext;
 	p->pnext = pn;
 	pn->id = id++;
+	node_count++;
+	WCHAR c[16];
+	_itow_s(node_count, c, 10);
+	theDlg.SetDlgItemText(IDC_NODEPOOL_USAGE, c);
 	return pn;
 #else // DEBUG
 	Map::node* pn = node_pool->pnext ? node_pool->pnext : enlarge_node_pool();
@@ -462,6 +476,10 @@ void Map::del(Map::node* p) {
 	node* pd = p->pnext;
 	p->pnext = pd->pnext;
 	delete pd;
+	node_count--;
+	WCHAR c[16];
+	_itow_s(node_count, c, 10);
+	theDlg.SetDlgItemText(IDC_NODEPOOL_USAGE, c);
 #else // DEBUG
 	Map::node* pd = p->pnext;
 	p->pnext = pd->pnext;
@@ -478,6 +496,13 @@ void Map::del(Map::head* h) {
 	delete pd->pnode;
 	h->pnext = pd->pnext;
 	delete pd;
+	head_count--;
+	WCHAR c[16];
+	_itow_s(head_count, c, 10);
+	theDlg.SetDlgItemText(IDC_HEADPOOL_USAGE, c);
+	node_count--;
+	_itow_s(node_count, c, 10);
+	theDlg.SetDlgItemText(IDC_NODEPOOL_USAGE, c);
 #else // DEBUG
 	Map::head* pd = h->pnext;
 
