@@ -15,7 +15,7 @@ extern DlgOptions theDlg;
 
 
 #ifdef DEBUG
-unsigned int insert_count, del_count, id, head_count, node_count;
+unsigned int insert_count, del_count, id, head_count, hstate, node_count, nstate;
 #endif
 
 inline void redraw_erase() {
@@ -426,13 +426,19 @@ Map::head* Map::insert(Map::head* p) {
 	pn->pnode = pnode;
 	memset(pnode, 0, sizeof(node));
 	pnode->id = id++;
-	head_count++;
 	WCHAR c[16];
-	_itow_s(head_count, c, 10);
-	theDlg.SetDlgItemText(IDC_HEADPOOL_USAGE, c);
+	if (!hstate) {
+		_itow_s(head_count, c, 10);
+		theDlg.SetDlgItemText(IDC_HEADPOOL_USAGE, c);
+		hstate = 1;
+	}
+	head_count++;
+	if (!nstate) {
+		_itow_s(node_count, c, 10);
+		theDlg.SetDlgItemText(IDC_NODEPOOL_USAGE, c);
+		nstate = 1;
+	}
 	node_count++;
-	_itow_s(node_count, c, 10);
-	theDlg.SetDlgItemText(IDC_NODEPOOL_USAGE, c);
 	return pn;
 #else // DEBUG
 	Map::head* pn = head_pool->pnext ? head_pool->pnext : enlarge_head_pool();
@@ -456,10 +462,13 @@ Map::node* Map::insert(Map::node* p) {
 	pn->pnext = p->pnext;
 	p->pnext = pn;
 	pn->id = id++;
-	node_count++;
 	WCHAR c[16];
-	_itow_s(node_count, c, 10);
-	theDlg.SetDlgItemText(IDC_NODEPOOL_USAGE, c);
+	if (!nstate) {
+		_itow_s(node_count, c, 10);
+		theDlg.SetDlgItemText(IDC_NODEPOOL_USAGE, c);
+		nstate = 1;
+	}
+	node_count++;
 	return pn;
 #else // DEBUG
 	Map::node* pn = node_pool->pnext ? node_pool->pnext : enlarge_node_pool();
@@ -476,10 +485,13 @@ void Map::del(Map::node* p) {
 	node* pd = p->pnext;
 	p->pnext = pd->pnext;
 	delete pd;
-	node_count--;
 	WCHAR c[16];
-	_itow_s(node_count, c, 10);
-	theDlg.SetDlgItemText(IDC_NODEPOOL_USAGE, c);
+	if (nstate) {
+		_itow_s(node_count, c, 10);
+		theDlg.SetDlgItemText(IDC_NODEPOOL_USAGE, c);
+		nstate = 0;
+	}
+	node_count--;
 #else // DEBUG
 	Map::node* pd = p->pnext;
 	p->pnext = pd->pnext;
@@ -496,13 +508,19 @@ void Map::del(Map::head* h) {
 	delete pd->pnode;
 	h->pnext = pd->pnext;
 	delete pd;
-	head_count--;
 	WCHAR c[16];
-	_itow_s(head_count, c, 10);
-	theDlg.SetDlgItemText(IDC_HEADPOOL_USAGE, c);
+	if (hstate) {
+		_itow_s(head_count, c, 10);
+		theDlg.SetDlgItemText(IDC_HEADPOOL_USAGE, c);
+		hstate = 0;
+	}
+	head_count--;
+	if (nstate) {
+		_itow_s(node_count, c, 10);
+		theDlg.SetDlgItemText(IDC_NODEPOOL_USAGE, c);
+		nstate = 0;
+	}
 	node_count--;
-	_itow_s(node_count, c, 10);
-	theDlg.SetDlgItemText(IDC_NODEPOOL_USAGE, c);
 #else // DEBUG
 	Map::head* pd = h->pnext;
 
