@@ -173,12 +173,6 @@ void CLifeMFCApp::OnOptionsSave()
 
 void CLifeMFCApp::OnHelpHelp()
 {
-	m_pMainWnd->MessageBox(L"Help:\n\
-		space - start/stop\n\
-		leftclick - select/unselect\n\
-		rightclick - deploy builtin\n\
-		b, 0-3 - select builtin\n\
-		d, 0-7 - select direction\n\
-		Options->C/D - Click two points to create/delete a rectangle region",
+	m_pMainWnd->MessageBox(L"Help:\n\nspace - start/stop\nleftclick - select/unselect\nrightclick - deploy builtin\nb, 0-3 - select builtin\nd, 0-7 - select direction\nOptions->C/D - Click two points to create/delete a rectangle region",
 		L"Help", MB_OK);
 }
