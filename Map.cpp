@@ -84,6 +84,10 @@ void Map::change(unsigned int xpos, unsigned int ypos, int type) {
 }
 
 void Map::calc() {
+#ifdef DEBUG
+	clock_t ts = GetTickCount();
+#endif // DEBUG
+
 	Map::head* px = cur.pnext;
 	while (px) {
 		Map::node* py = px->pnode->pnext;
@@ -107,6 +111,14 @@ void Map::calc() {
 		px = px->pnext;
 	}
 	clear(&nxt);
+#ifdef DEBUG
+	clock_t te = GetTickCount();
+	clock_t t = te - ts;
+	TCHAR s[16];
+	_itow_s(t, s, 10);
+	if (theDlg.GetSafeHwnd())
+		theDlg.SetDlgItemText(IDC_NODEPOOL_SIZE, s);
+#endif // DEBUG
 }
 
 void Map::clear() {
@@ -246,6 +258,7 @@ void Map::draw(HDC hdc, RECT rect, bool erase, HBRUSH hBlackBrush, HBRUSH hWhite
 		}
 		ppx = ppx->pnext;
 	}
+
 }
 
 RECT Map::get_builtin_info(int b) {
