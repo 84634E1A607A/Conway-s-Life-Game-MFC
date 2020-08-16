@@ -86,10 +86,10 @@ BOOL DlgOptions::OnInitDialog()
 	pSetY->SendMessage(EM_SETLIMITTEXT, 10, 0);
 	pSetY->SendMessage(WM_SETTEXT, 0, (LPARAM)L"08000000");
 
-#ifdef DEBUG
+#ifdef REALTIME_NEW
 	SetDlgItemText(IDC_HEADPOOL_SIZE, L"1");
 	SetDlgItemText(IDC_NODEPOOL_SIZE, L"1");
-#else // DEBUG
+#else
 	SetDlgItemText(IDC_HEADPOOL_SIZE, map.get_size());
 	SetDlgItemText(IDC_NODEPOOL_SIZE, map.get_size());
 #endif

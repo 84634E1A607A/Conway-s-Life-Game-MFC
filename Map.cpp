@@ -5,6 +5,10 @@
 #include "ChildView.h"
 #include "DlgOptions.h"
 
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#endif
+
 int side_length = 10;
 unsigned int xpivot = 0x08000000, ypivot = 0x08000000;
 bool needErase = true, started;
@@ -14,8 +18,8 @@ char ids_help_about[256], ids_help_help[1024];
 extern DlgOptions theDlg;
 
 
-#ifdef DEBUG
-unsigned int insert_count, del_count, id, head_count, hstate, node_count, nstate;
+#ifdef REALTIME_NEW
+unsigned int head_count, hstate, node_count, nstate;
 #endif
 
 inline void redraw_erase() {
@@ -37,10 +41,10 @@ inline void change_ypivot() {
 }
 
 Map::Map() {
-#ifdef DEBUG
+#ifdef REALTIME_NEW
 	head_pool = new head, node_pool = new node;
 	cur.pnext = pre.pnext = nxt.pnext = nullptr;
-#else // DEBUG
+#else
 	head_pool = new Map::head[SIZE];
 	node_pool = new Map::node[SIZE];
 	memset(head_pool, 0, SIZE * sizeof(Map::head));
@@ -107,7 +111,8 @@ void Map::calc() {
 
 void Map::clear() {
 	Sleep(TIMER);
-#ifdef DEBUG
+	xpivot = ypivot = 0x08000000;
+#ifdef REALTIME_NEW
 	clear(&pre);
 	clear(&cur);
 	cur.pnext = nullptr, nxt.pnext = nullptr, pre.pnext = nullptr, ppre = nullptr;
@@ -142,10 +147,9 @@ void Map::clear() {
 		pdel = pnode;
 	}
 	pnode_pools.pnext = nullptr;
-#endif
-
 	headpool_usage = nodepool_usage = 1;
 	refresh_headpool_usage(), refresh_nodepool_usage();
+#endif
 	change_xpivot(), change_ypivot();
 }
 
@@ -390,6 +394,7 @@ Map::node* Map::enlarge_node_pool() {
 	Map::node* nnode_pool = new Map::node[SIZE];
 	memset(nnode_pool, 0, SIZE * sizeof(Map::node));
 	for (int i = 0; i < SIZE; i++) (nnode_pool + i)->pnext = nnode_pool + i + 1;
+
 	(nnode_pool + SIZE - 1)->pnext = nullptr;
 	node_pool->pnext = nnode_pool;
 
@@ -417,15 +422,13 @@ inline void Map::refresh_nodepool_usage() {
 }
 
 Map::head* Map::insert(Map::head* p) {
-#ifdef DEBUG
-	insert_count++;
+#ifdef REALTIME_NEW
 	head* pn = new head;
 	pn->pnext = p->pnext;
 	p->pnext = pn;
 	node* pnode = new node;
 	pn->pnode = pnode;
 	memset(pnode, 0, sizeof(node));
-	pnode->id = id++;
 	WCHAR c[16];
 	if (!hstate) {
 		_itow_s(head_count, c, 10);
@@ -440,7 +443,7 @@ Map::head* Map::insert(Map::head* p) {
 	}
 	node_count++;
 	return pn;
-#else // DEBUG
+#else
 	Map::head* pn = head_pool->pnext ? head_pool->pnext : enlarge_head_pool();
 	head_pool->pnext = pn->pnext;
 	pn->pnext = p->pnext;
@@ -455,13 +458,11 @@ Map::head* Map::insert(Map::head* p) {
 }
 
 Map::node* Map::insert(Map::node* p) {
-#ifdef DEBUG
-	insert_count++;
+#ifdef REALTIME_NEW
 	node* pn = new node;
 	memset(pn, 0, sizeof(node));
 	pn->pnext = p->pnext;
 	p->pnext = pn;
-	pn->id = id++;
 	WCHAR c[16];
 	if (!nstate) {
 		_itow_s(node_count, c, 10);
@@ -470,7 +471,7 @@ Map::node* Map::insert(Map::node* p) {
 	}
 	node_count++;
 	return pn;
-#else // DEBUG
+#else
 	Map::node* pn = node_pool->pnext ? node_pool->pnext : enlarge_node_pool();
 	node_pool->pnext = pn->pnext;
 	pn->pnext = p->pnext;
@@ -480,8 +481,7 @@ Map::node* Map::insert(Map::node* p) {
 }
 
 void Map::del(Map::node* p) {
-#ifdef DEBUG
-	del_count++;
+#ifdef REALTIME_NEW
 	node* pd = p->pnext;
 	p->pnext = pd->pnext;
 	delete pd;
@@ -492,7 +492,7 @@ void Map::del(Map::node* p) {
 		nstate = 0;
 	}
 	node_count--;
-#else // DEBUG
+#else
 	Map::node* pd = p->pnext;
 	p->pnext = pd->pnext;
 	pd->pnext = node_pool->pnext;
@@ -502,8 +502,7 @@ void Map::del(Map::node* p) {
 }
 
 void Map::del(Map::head* h) {
-#ifdef DEBUG
-	del_count++;
+#ifdef REALTIME_NEW
 	head* pd = h->pnext;
 	delete pd->pnode;
 	h->pnext = pd->pnext;
@@ -521,7 +520,7 @@ void Map::del(Map::head* h) {
 		nstate = 0;
 	}
 	node_count--;
-#else // DEBUG
+#else 
 	Map::head* pd = h->pnext;
 
 	Map::node* pdn = pd->pnode;
@@ -538,10 +537,10 @@ void Map::del(Map::head* h) {
 }
 
 void Map::add(unsigned int xpos, unsigned int ypos) {
-#ifdef DEBUG
+#ifdef REALTIME_NEW
 	ppre = nullptr;
 #endif
-	if (!ppre) ppre = &nxt;
+	if (!ppre || !nxt.pnext) ppre = &nxt;
 	Map::head* px = &nxt;
 	if (ppre->pnext && ppre->pnext->x <= xpos) px = ppre;
 	while (px->pnext && px->pnext->x <= xpos) px = px->pnext;
@@ -664,12 +663,12 @@ void Map::init_builtins() {
 }
 
 Map::~Map() {
-#ifdef DEBUG
+#ifdef REALTIME_NEW
 	clear(&pre);
 	clear(&cur);
 	delete phead_pools.phead;
 	delete pnode_pools.pnode;
-#else // DEBUG
+#else
 	ppool* phead = phead_pools.pnext, * pdel = phead;
 	while (phead != nullptr) {
 		delete[] phead->phead;

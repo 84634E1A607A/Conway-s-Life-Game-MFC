@@ -1,5 +1,7 @@
 #pragma once
 
+//#define REALTIME_NEW
+
 extern int side_length;
 extern unsigned int xpivot, ypivot;
 extern bool needErase, started;
@@ -31,10 +33,6 @@ private:
 		bool state;
 		BYTE count;
 		node* pnext;
-#ifdef DEBUG
-		unsigned int id;
-#endif // DEBUG
-
 	};
 
 	struct head {
