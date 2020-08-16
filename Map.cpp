@@ -47,9 +47,9 @@ Map::Map() {
 	node_pool = new Map::node[SIZE];
 	memset(head_pool, 0, SIZE * sizeof(Map::head));
 	memset(node_pool, 0, SIZE * sizeof(Map::node));
-	for (int i = 0; i < SIZE; i++) (head_pool + i)->pnext = head_pool + i + 1;
-	for (int i = 0; i < SIZE; i++) (node_pool + i)->pnext = node_pool + i + 1;
-	(head_pool + SIZE - 1)->pnext = nullptr;  (node_pool + SIZE - 1)->pnext = nullptr;
+	for (int i = 0; i < SIZE; i++) head_pool[i].pnext = &head_pool[i + 1];
+	for (int i = 0; i < SIZE; i++) node_pool[i].pnext = &node_pool[i + 1];
+	head_pool[SIZE - 1].pnext = nullptr;  node_pool[SIZE - 1].pnext = nullptr;
 	cur.pnext = nullptr;
 #endif
 	phead_pools = { head_pool, nullptr, nullptr };
@@ -131,9 +131,9 @@ void Map::clear() {
 #else
 	memset(head_pool, 0, SIZE * sizeof(Map::head));
 	memset(node_pool, 0, SIZE * sizeof(Map::node));
-	for (int i = 0; i < SIZE; i++) (head_pool + i)->pnext = head_pool + i + 1;
-	for (int i = 0; i < SIZE; i++) (node_pool + i)->pnext = node_pool + i + 1;
-	(head_pool + SIZE - 1)->pnext = nullptr;  (node_pool + SIZE - 1)->pnext = nullptr;
+	for (int i = 0; i < SIZE; i++) head_pool[i].pnext = &head_pool[i + 1];
+	for (int i = 0; i < SIZE; i++) node_pool[i].pnext = &node_pool[i + 1];
+	head_pool[SIZE - 1].pnext = nullptr;  node_pool[SIZE - 1].pnext = nullptr;
 	cur.pnext = nullptr, nxt.pnext = nullptr, ppre = nullptr;
 	
 	redraw();
@@ -349,14 +349,8 @@ void Map::dump(const char* fname) {
 	fclose(fout);
 }
 
-void Map::trial_auto_release()
+void Map::trial_auto_release()//ctrl+v（逃） 目的：Stop时清空head_pool和node_pool Bug:node_pool->pnext会莫名其妙变成NULL，并且不会在单步调试的时候出现问题
 {
-#if 0
-	memset(head_pool, 0, SIZE * sizeof(Map::head));
-	memset(node_pool, 0, SIZE * sizeof(Map::node));
-	for (int i = 0; i < SIZE; i++) (head_pool + i)->pnext = head_pool + i + 1;
-	for (int i = 0; i < SIZE; i++) (node_pool + i)->pnext = node_pool + i + 1;
-	(head_pool + SIZE - 1)->pnext = nullptr;  (node_pool + SIZE - 1)->pnext = nullptr;
 	ppool* phead = phead_pools.pnext, * pdel = phead;
 	while (phead != nullptr) {
 		delete[] phead->phead;
@@ -374,14 +368,13 @@ void Map::trial_auto_release()
 		pdel = pnode;
 	}
 	pnode_pools.pnext = nullptr;
-#endif
 }
 
 Map::head* Map::enlarge_head_pool() {
 	Map::head* nhead_pool = new Map::head[SIZE];
 	memset(nhead_pool, 0, SIZE * sizeof(Map::head));
-	for (int i = 0; i < SIZE; i++) (nhead_pool + i)->pnext = nhead_pool + i + 1;
-	(nhead_pool + SIZE - 1)->pnext = nullptr;
+	for (int i = 0; i < SIZE; i++) nhead_pool[i].pnext = &nhead_pool[i + 1];
+	nhead_pool[SIZE - 1].pnext = nullptr;
 	head_pool->pnext = nhead_pool;
 
 	ppool* nphead_pool = new ppool;
