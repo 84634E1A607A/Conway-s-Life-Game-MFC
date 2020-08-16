@@ -56,32 +56,56 @@ void CChildView::OnPaint()
 	extern bool needErase;
 	extern int side_length;
 
+#ifdef DEBUG
+	clock_t ts = GetTickCount();
+#endif // DEBUG
+
+
 	CPaintDC dc(this); // device context for painting
-	HDC hdc = dc.GetSafeHdc();
 	RECT updateRect = dc.m_ps.rcPaint;
 
 	static HBRUSH hBlackBrush = (HBRUSH)GetStockObject(BLACK_BRUSH); //CreateSolidBrush(RGB(0x00, 0x00, 0x00));
 
 	static HPEN hLinePen = CreatePen(PS_SOLID, 1, RGB(0xaa, 0xaa, 0xaa));
-	SelectObject(hdc, hBlackBrush);
-	SelectObject(hdc, hLinePen);
+	dc.SelectObject(hBlackBrush);
+	dc.SelectObject(hLinePen);
 
 	/*  lines  */
 	if (needErase) {
 		for (int i = updateRect.left / side_length; i <= updateRect.right / side_length; i++) {
-			MoveToEx(hdc, i * side_length, updateRect.top, nullptr);
-			LineTo(hdc, i * side_length, updateRect.bottom);
+			dc.MoveTo(i * side_length, updateRect.top);
+			dc.LineTo(i * side_length, updateRect.bottom);
 		}
 		for (int i = updateRect.top / side_length; i <= updateRect.bottom / side_length; i++) {
-			MoveToEx(hdc, updateRect.left, i * side_length, nullptr);
-			LineTo(hdc, updateRect.right, i * side_length);
+			dc.MoveTo(updateRect.left, i * side_length);
+			dc.LineTo(updateRect.right, i * side_length);
 		}
 	}
 
+	CDC mdc;
+	mdc.CreateCompatibleDC(&dc);
+	CBitmap bmp;
+	RECT CliRect;
+	GetClientRect(&CliRect);
+	bmp.CreateCompatibleBitmap(&dc, CliRect.right, CliRect.bottom);
+	mdc.SelectObject(bmp);
+	mdc.BitBlt(0, 0, CliRect.right, CliRect.bottom, &dc, 0, 0, SRCCOPY);
+
 	/*  blocks  */
-	map.draw(hdc, updateRect);
-	// TODO: Add your message handler code here
-	// Do not call CWnd::OnPaint() for painting messages
+	map.draw(mdc.GetSafeHdc(), updateRect);
+
+	dc.BitBlt(0, 0, CliRect.right, CliRect.bottom, &mdc, 0, 0, SRCCOPY);
+	mdc.DeleteDC();
+	bmp.DeleteObject();
+
+#ifdef DEBUG
+	clock_t te = GetTickCount();
+	clock_t t = te - ts;
+	TCHAR s[16];
+	_itow_s(t, s, 10);
+	if (theDlg.GetSafeHwnd())
+		theDlg.SetDlgItemText(IDC_HEADPOOL_SIZE, s);
+#endif // DEBUG
 }
 
 BOOL CChildView::OnEraseBkgnd(CDC* pDC)
