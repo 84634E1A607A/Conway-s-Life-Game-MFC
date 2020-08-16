@@ -144,6 +144,9 @@ void DlgOptions::OnChangeScale()
 void DlgOptions::OnBnClickedStartstop()
 {
 	started = !started;
+	if (!started) {
+		map.trial_auto_release();
+	}
 }
 
 

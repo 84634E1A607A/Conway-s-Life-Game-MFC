@@ -372,6 +372,34 @@ void Map::dump(const char* fname) {
 	fclose(fout);
 }
 
+void Map::trial_auto_release()
+{
+#if 0
+	memset(head_pool, 0, SIZE * sizeof(Map::head));
+	memset(node_pool, 0, SIZE * sizeof(Map::node));
+	for (int i = 0; i < SIZE; i++) (head_pool + i)->pnext = head_pool + i + 1;
+	for (int i = 0; i < SIZE; i++) (node_pool + i)->pnext = node_pool + i + 1;
+	(head_pool + SIZE - 1)->pnext = nullptr;  (node_pool + SIZE - 1)->pnext = nullptr;
+	ppool* phead = phead_pools.pnext, * pdel = phead;
+	while (phead != nullptr) {
+		delete[] phead->phead;
+		phead = phead->pnext;
+		delete pdel;
+		pdel = phead;
+	}
+	phead_pools.pnext = nullptr;
+
+	ppool* pnode = pnode_pools.pnext; pdel = pnode;
+	while (pnode != nullptr) {
+		delete[] pnode->pnode;
+		pnode = pnode->pnext;
+		delete pdel;
+		pdel = pnode;
+	}
+	pnode_pools.pnext = nullptr;
+#endif
+}
+
 Map::head* Map::enlarge_head_pool() {
 	Map::head* nhead_pool = new Map::head[SIZE];
 	memset(nhead_pool, 0, SIZE * sizeof(Map::head));

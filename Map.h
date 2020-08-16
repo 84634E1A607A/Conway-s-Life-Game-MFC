@@ -27,6 +27,7 @@ public:
 	LPCTSTR get_size();
 	void load(const char*);
 	void dump(const char*);
+	void trial_auto_release();
 private:
 	struct node {
 		unsigned int y;
