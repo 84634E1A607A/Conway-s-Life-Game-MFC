@@ -11,7 +11,7 @@
 
 int side_length = 10;
 unsigned int xpivot = 0x08000000, ypivot = 0x08000000;
-bool needErase = true, started;
+bool started;
 unsigned int selected_builtin, selected_direction, kbd_input_state, TIMER = 500;
 const unsigned int move_length = 30;
 char ids_help_about[256], ids_help_help[1024];
@@ -22,10 +22,8 @@ extern DlgOptions theDlg;
 unsigned int head_count, hstate, node_count, nstate;
 #endif
 
-inline void redraw_erase() {
-	RECT rect;
-	theApp.m_pMainWnd->GetClientRect(&rect);
-	theApp.m_pMainWnd->RedrawWindow(&rect, 0, RDW_ERASE | RDW_INVALIDATE);
+inline void redraw() {
+	theApp.m_pMainWnd->RedrawWindow(nullptr, nullptr, RDW_INVALIDATE);
 }
 
 inline void change_xpivot() {
@@ -85,7 +83,7 @@ void Map::change(unsigned int xpos, unsigned int ypos, int type) {
 
 void Map::calc() {
 #ifdef DEBUG
-	clock_t ts = GetTickCount();
+	clock_t ts = clock();
 #endif // DEBUG
 
 	Map::head* px = cur.pnext;
@@ -101,9 +99,7 @@ void Map::calc() {
 		}
 		px = px->pnext;
 	}
-	clear(&pre);
-	pre.pnext = cur.pnext;
-	cur.pnext = nullptr;
+	clear(&cur);
 	px = nxt.pnext;
 	while (px) {
 		Map::node* py = px->pnode->pnext;
@@ -112,7 +108,7 @@ void Map::calc() {
 	}
 	clear(&nxt);
 #ifdef DEBUG
-	clock_t te = GetTickCount();
+	clock_t te = clock();
 	clock_t t = te - ts;
 	TCHAR s[16];
 	_itow_s(t, s, 10);
@@ -127,7 +123,7 @@ void Map::clear() {
 #ifdef REALTIME_NEW
 	clear(&pre);
 	clear(&cur);
-	cur.pnext = nullptr, nxt.pnext = nullptr, pre.pnext = nullptr, ppre = nullptr;
+	cur.pnext = nullptr, nxt.pnext = nullptr, ppre = nullptr;
 	head_count = node_count = 0;
 	theDlg.SetDlgItemText(IDC_HEADPOOL_USAGE, L"0");
 	theDlg.SetDlgItemText(IDC_NODEPOOL_USAGE, L"0");
@@ -138,9 +134,9 @@ void Map::clear() {
 	for (int i = 0; i < SIZE; i++) (head_pool + i)->pnext = head_pool + i + 1;
 	for (int i = 0; i < SIZE; i++) (node_pool + i)->pnext = node_pool + i + 1;
 	(head_pool + SIZE - 1)->pnext = nullptr;  (node_pool + SIZE - 1)->pnext = nullptr;
-	cur.pnext = nullptr, nxt.pnext = nullptr, pre.pnext = nullptr, ppre = nullptr;
+	cur.pnext = nullptr, nxt.pnext = nullptr, ppre = nullptr;
 	
-	redraw_erase();
+	redraw();
 
 	ppool* phead = phead_pools.pnext, * pdel = phead;
 	while (phead != nullptr) {
@@ -206,59 +202,27 @@ void Map::add_delete_region(RECT& rect, bool isadd, bool isrand) {
 	}
 }
 
-void Map::draw(HDC hdc, RECT rect, bool erase, HBRUSH hBlackBrush, HBRUSH hWhiteBrush) {
-	needErase = false;
+void Map::draw(CDC& cdc, RECT& rect) {
 	unsigned int left = rect.left / side_length + xpivot, right = rect.right / side_length + xpivot;
 	unsigned int top = rect.top / side_length + ypivot, bottom = rect.bottom / side_length + ypivot;
-	Map::head* pl = &cur, * ppl = &pre;
+	Map::head* pl = &cur;
 	while (pl->pnext && pl->pnext->x < left) pl = pl->pnext;
-	while (ppl->pnext && ppl->pnext->x < left) ppl = ppl->pnext;
-	Map::head* px = pl, * ppx = ppl;
+	Map::head* px = pl;
 	while (px->pnext && px->pnext->x <= right) {
-		if (!erase) while (ppx->pnext && ppx->pnext->x < px->pnext->x) ppx = ppx->pnext;
-		Map::node* py = px->pnext->pnode, * ppy = (ppx->pnext && ppx->pnext->x == px->pnext->x) ? ppx->pnext->pnode : nullptr;
+		Map::node* py = px->pnext->pnode;
 		while (py->pnext && py->pnext->y < top) py = py->pnext;
-		if (!erase && ppy) while (ppy->pnext && ppy->pnext->y < top) ppy = ppy->pnext;
 		while (py->pnext && py->pnext->y <= bottom) {
-			if (ppy && !erase) {
-				while (ppy->pnext && ppy->pnext->y < py->pnext->y) ppy = ppy->pnext;
-				if (ppy->pnext && ppy->pnext->y == py->pnext->y) { py = py->pnext; continue; }
-			}
 			RECT fill_rect = {
 				(LONG)((px->pnext->x - xpivot) * side_length + 1), //left
 				(LONG)((py->pnext->y - ypivot) * side_length + 1), //top
 				(LONG)((px->pnext->x - xpivot + 1) * side_length), //right
 				(LONG)((py->pnext->y - ypivot + 1) * side_length)  //bottom
 			};
-			FillRect(hdc, &fill_rect, hBlackBrush);
+			cdc.FillSolidRect(&fill_rect, RGB(0, 0, 0));
 			py = py->pnext;
 		}
 		px = px->pnext;
 	}
-	if (erase) return;
-	px = pl, ppx = ppl;
-	while (ppx->pnext && ppx->pnext->x <= right) {
-		while (px->pnext && px->pnext->x < ppx->pnext->x) px = px->pnext;
-		Map::node* ppy = ppx->pnext->pnode, * py = (px->pnext && px->pnext->x == ppx->pnext->x) ? px->pnext->pnode : nullptr;
-		while (ppy->pnext && ppy->pnext->y < top) ppy = ppy->pnext;
-		if (py) while (py->pnext && py->pnext->y < top) py = py->pnext;
-		while (ppy->pnext && ppy->pnext->y <= bottom) {
-			if (py) {
-				while (py->pnext && py->pnext->y < ppy->pnext->y) py = py->pnext;
-				if (py->pnext && py->pnext->y == ppy->pnext->y) { ppy = ppy->pnext; continue; }
-			}
-			RECT fill_rect = {
-				(LONG)((ppx->pnext->x - xpivot) * side_length + 1), //left
-				(LONG)((ppy->pnext->y - ypivot) * side_length + 1), //top
-				(LONG)((ppx->pnext->x - xpivot + 1) * side_length), //right
-				(LONG)((ppy->pnext->y - ypivot + 1) * side_length)  //bottom
-			};
-			FillRect(hdc, &fill_rect, hWhiteBrush);
-			ppy = ppy->pnext;
-		}
-		ppx = ppx->pnext;
-	}
-
 }
 
 RECT Map::get_builtin_info(int b) {
@@ -350,7 +314,7 @@ void Map::load(const char* fname) {
 			change(x, y);
 		}
 		fclose(fin);
-		redraw_erase();
+		redraw();
 	}
 	catch (const LPCTSTR msg) {
 		theApp.m_pMainWnd->MessageBox(msg, L"Error", MB_OK);

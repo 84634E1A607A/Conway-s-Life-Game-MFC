@@ -4,11 +4,11 @@
 
 extern int side_length;
 extern unsigned int xpivot, ypivot;
-extern bool needErase, started;
+extern bool started;
 extern unsigned int selected_builtin, selected_direction, kbd_input_state, TIMER;
 extern const unsigned int move_length;
 extern char ids_help_about[256], ids_help_help[1024];
-inline void redraw_erase();
+inline void redraw();
 inline void change_xpivot();
 inline void change_ypivot();
 
@@ -21,7 +21,7 @@ public:
 	void clear();
 	void add_builtin(const unsigned int& xpos, const unsigned int& ypos, const unsigned int& b = selected_builtin, const unsigned int& d = selected_direction);
 	void add_delete_region(RECT&, bool, bool);
-	void draw(HDC hdc, RECT rect, bool erase = needErase, HBRUSH hBlackBrush = (HBRUSH)GetStockObject(BLACK_BRUSH), HBRUSH hWhiteBrush = (HBRUSH)GetStockObject(WHITE_BRUSH));
+	void draw(CDC& hdc, RECT& rect);
 	RECT get_builtin_info(int b = selected_builtin);
 	void draw_builtin(CDialog* Dlg, const unsigned int& b = selected_builtin, const unsigned int& d = selected_direction);
 	LPCTSTR get_size();
@@ -66,7 +66,6 @@ private:
 	void mark(unsigned int, unsigned int);
 	void clear(head*);
 	void init_builtins();
-	head pre;	//Previous map
 	head cur;	//Current map
 	head nxt;	//Next map
 	head* ppre;

@@ -26,7 +26,7 @@ CChildView::~CChildView()
 
 BEGIN_MESSAGE_MAP(CChildView, CWnd)
 	ON_WM_PAINT()
-	ON_WM_ERASEBKGND()
+//	ON_WM_ERASEBKGND()
 	ON_WM_LBUTTONDOWN()
 //	ON_WM_TIMER()
 	ON_WM_KEYDOWN()
@@ -53,34 +53,19 @@ BOOL CChildView::PreCreateWindow(CREATESTRUCT& cs)
 
 void CChildView::OnPaint() 
 {
-	extern bool needErase;
 	extern int side_length;
 
 #ifdef DEBUG
-	clock_t ts = GetTickCount();
+	clock_t ts = clock();
 #endif // DEBUG
 
 
 	CPaintDC dc(this); // device context for painting
-	RECT updateRect = dc.m_ps.rcPaint;
 
 	static HBRUSH hBlackBrush = (HBRUSH)GetStockObject(BLACK_BRUSH); //CreateSolidBrush(RGB(0x00, 0x00, 0x00));
+	static CBrush pWhiteBrush(RGB(255, 255, 255));
 
 	static HPEN hLinePen = CreatePen(PS_SOLID, 1, RGB(0xaa, 0xaa, 0xaa));
-	dc.SelectObject(hBlackBrush);
-	dc.SelectObject(hLinePen);
-
-	/*  lines  */
-	if (needErase) {
-		for (int i = updateRect.left / side_length; i <= updateRect.right / side_length; i++) {
-			dc.MoveTo(i * side_length, updateRect.top);
-			dc.LineTo(i * side_length, updateRect.bottom);
-		}
-		for (int i = updateRect.top / side_length; i <= updateRect.bottom / side_length; i++) {
-			dc.MoveTo(updateRect.left, i * side_length);
-			dc.LineTo(updateRect.right, i * side_length);
-		}
-	}
 
 	CDC mdc;
 	mdc.CreateCompatibleDC(&dc);
@@ -89,17 +74,33 @@ void CChildView::OnPaint()
 	GetClientRect(&CliRect);
 	bmp.CreateCompatibleBitmap(&dc, CliRect.right, CliRect.bottom);
 	mdc.SelectObject(bmp);
-	mdc.BitBlt(0, 0, CliRect.right, CliRect.bottom, &dc, 0, 0, SRCCOPY);
+	//mdc.BitBlt(0, 0, CliRect.right, CliRect.bottom, &dc, 0, 0, SRCCOPY);
+
+	mdc.SelectObject(hBlackBrush);
+	mdc.SelectObject(hLinePen);
+
+	/*  init   */
+	mdc.FillRect(&CliRect, &pWhiteBrush);
+
+	/*  lines  */
+	for (int i = 0; i <= CliRect.right / side_length; i++) {
+		mdc.MoveTo(i * side_length, 0);
+		mdc.LineTo(i * side_length, CliRect.bottom);
+	}
+	for (int i = 0; i <= CliRect.bottom / side_length; i++) {
+		mdc.MoveTo(0, i * side_length);
+		mdc.LineTo(CliRect.right, i * side_length);
+	}
 
 	/*  blocks  */
-	map.draw(mdc.GetSafeHdc(), updateRect);
+	map.draw(mdc, CliRect);
 
 	dc.BitBlt(0, 0, CliRect.right, CliRect.bottom, &mdc, 0, 0, SRCCOPY);
 	mdc.DeleteDC();
 	bmp.DeleteObject();
 
 #ifdef DEBUG
-	clock_t te = GetTickCount();
+	clock_t te = clock();
 	clock_t t = te - ts;
 	TCHAR s[16];
 	_itow_s(t, s, 10);
@@ -108,12 +109,12 @@ void CChildView::OnPaint()
 #endif // DEBUG
 }
 
-BOOL CChildView::OnEraseBkgnd(CDC* pDC)
-{
-	// TODO: Add your message handler code here and/or call default
-	needErase = true;
-	return CWnd::OnEraseBkgnd(pDC);
-}
+//BOOL CChildView::OnEraseBkgnd(CDC* pDC)
+//{
+//	// TODO: Add your message handler code here and/or call default
+//	needErase = true;
+//	return CWnd::OnEraseBkgnd(pDC);
+//}
 
 
 void CChildView::OnLButtonDown(UINT nFlags, CPoint point)
@@ -150,7 +151,7 @@ void CChildView::OnLButtonDown(UINT nFlags, CPoint point)
 		}
 		}
 	}
-	RedrawWindow(&crect, 0, RDW_INVALIDATE | RDW_ERASE);
+	RedrawWindow(&crect, 0, RDW_INVALIDATE);
 	CWnd::OnLButtonDown(nFlags, point);
 }
 
@@ -160,13 +161,14 @@ void CChildView::OnRButtonDown(UINT nFlags, CPoint point)
 	// TODO: Add your message handler code here and/or call default
 	int xc = point.x / side_length, yc = point.y / side_length;
 	map.add_builtin(xc + xpivot, yc + ypivot);
-	RECT crect;
-	if (selected_direction < 0);
-	else if (selected_direction < 4)
-		crect = { xc * side_length + 1, yc * side_length + 1, (xc + map.get_builtin_info().right) * side_length, (yc + map.get_builtin_info().bottom) * side_length };
-	else if (selected_direction < 8)
-		crect = { xc * side_length + 1, yc * side_length + 1, (xc + map.get_builtin_info().bottom) * side_length, (yc + map.get_builtin_info().right) * side_length };
-	RedrawWindow(&crect, 0, RDW_INVALIDATE | RDW_ERASE);
+	//RECT crect;
+	//if (selected_direction < 0);
+	//else if (selected_direction < 4)
+	//	crect = { xc * side_length + 1, yc * side_length + 1, (xc + map.get_builtin_info().right) * side_length, (yc + map.get_builtin_info().bottom) * side_length };
+	//else if (selected_direction < 8)
+	//	crect = { xc * side_length + 1, yc * side_length + 1, (xc + map.get_builtin_info().bottom) * side_length, (yc + map.get_builtin_info().right) * side_length };
+	//RedrawWindow(&crect, 0, RDW_INVALIDATE);
+	RedrawWindow(nullptr, nullptr, RDW_INVALIDATE);
 	CWnd::OnRButtonDown(nFlags, point);
 }
 
@@ -187,25 +189,25 @@ void CChildView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 	switch (nChar) {
 	case VK_LEFT: {
 		xpivot -= move_length / side_length;
-		redraw_erase();
+		RedrawWindow(nullptr, nullptr, RDW_INVALIDATE);
 		change_xpivot();
 		break;
 	}
 	case VK_RIGHT: {
 		xpivot += move_length / side_length;
-		redraw_erase();
+		RedrawWindow(nullptr, nullptr, RDW_INVALIDATE);
 		change_xpivot();
 		break;
 	}
 	case VK_UP: {
 		ypivot -= move_length / side_length;
-		redraw_erase();
+		RedrawWindow(nullptr, nullptr, RDW_INVALIDATE);
 		change_ypivot();
 		break;
 	}
 	case VK_DOWN: {
 		ypivot += move_length / side_length;
-		redraw_erase();
+		RedrawWindow(nullptr, nullptr, RDW_INVALIDATE);
 		change_ypivot();
 		break;
 	}

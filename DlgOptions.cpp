@@ -137,7 +137,7 @@ void DlgOptions::OnChangeScale()
 	GetDlgItemText(IDC_SCALE, val, 16);
 	int v = _wtoi(val);
 	if (v <= 2) SetDlgItemText(IDC_SCALE, L"3");
-	else side_length = v, redraw_erase();
+	else side_length = v, redraw();
 }
 
 
@@ -158,7 +158,7 @@ void DlgOptions::OnBnClickedReset()
 void DlgOptions::OnBnClickedUp()
 {
 	ypivot -= 5 * move_length / side_length;
-	redraw_erase();
+	redraw();
 	change_ypivot();
 }
 
@@ -166,7 +166,7 @@ void DlgOptions::OnBnClickedUp()
 void DlgOptions::OnBnClickedDown()
 {
 	ypivot += 5 * move_length / side_length;
-	redraw_erase();
+	redraw();
 	change_ypivot();
 }
 
@@ -174,7 +174,7 @@ void DlgOptions::OnBnClickedDown()
 void DlgOptions::OnBnClickedLeft()
 {
 	xpivot -= 5 * move_length / side_length;
-	redraw_erase();
+	redraw();
 	change_xpivot();
 }
 
@@ -182,7 +182,7 @@ void DlgOptions::OnBnClickedLeft()
 void DlgOptions::OnBnClickedRight()
 {
 	xpivot += 5 * move_length / side_length;
-	redraw_erase();
+	redraw();
 	change_xpivot();
 }
 
@@ -205,7 +205,7 @@ void DlgOptions::OnChangeXpivot()
 	else {
 		MessageBox(L"X Pivot should be a value ranged (0, 0x10000000)", L"Error", MB_OK);
 	}
-	change_xpivot(), redraw_erase();
+	change_xpivot(), redraw();
 }
 
 
@@ -227,5 +227,5 @@ void DlgOptions::OnChangeYpivot()
 	else {
 		MessageBox(L"Y Pivot should be a value ranged (0, 0x10000000)", L"Error", MB_OK);
 	}
-	change_ypivot(), redraw_erase();
+	change_ypivot(), redraw();
 }
