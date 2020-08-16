@@ -63,8 +63,6 @@ void CChildView::OnPaint()
 	CPaintDC dc(this); // device context for painting
 
 	static HBRUSH hBlackBrush = (HBRUSH)GetStockObject(BLACK_BRUSH); //CreateSolidBrush(RGB(0x00, 0x00, 0x00));
-	static CBrush pWhiteBrush(RGB(255, 255, 255));
-
 	static HPEN hLinePen = CreatePen(PS_SOLID, 1, RGB(0xaa, 0xaa, 0xaa));
 
 	CDC mdc;
@@ -80,7 +78,7 @@ void CChildView::OnPaint()
 	mdc.SelectObject(hLinePen);
 
 	/*  init   */
-	mdc.FillRect(&CliRect, &pWhiteBrush);
+	mdc.FillSolidRect(&CliRect, RGB(255,255,255));
 
 	/*  lines  */
 	for (int i = 0; i <= CliRect.right / side_length; i++) {
