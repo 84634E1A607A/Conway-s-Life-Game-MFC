@@ -64,6 +64,7 @@ public:
 	LPCTSTR get_size();
 	void load(const char*);
 	void dump(const char*);
+	void trial_auto_release();
 
 private:
 	head* enlarge_head_pool();
