@@ -29,13 +29,13 @@ inline void redraw() {
 inline void change_xpivot() {
 	WCHAR xpivot_c[16];
 	wsprintf(xpivot_c, L"%08x", xpivot);
-	theDlg.GetDlgItem(IDC_XPIVOT)->SendMessage(WM_SETTEXT, 0, (LPARAM)xpivot_c);
+	theDlg.SetDlgItemText(IDC_XPIVOT, xpivot_c);
 }
 
 inline void change_ypivot() {
 	WCHAR ypivot_c[16];
 	wsprintf(ypivot_c, L"%08x", ypivot);
-	theDlg.GetDlgItem(IDC_YPIVOT)->SendMessage(WM_SETTEXT, 0, (LPARAM)ypivot_c);
+	theDlg.SetDlgItemText(IDC_YPIVOT, ypivot_c);
 }
 
 Map::Map() {
@@ -58,8 +58,9 @@ Map::Map() {
 }
 
 //type: {0: 1->0, 0->1; 1: 0,1->1; 2: 0,1->0}
-void Map::change(unsigned int xpos, unsigned int ypos, int type) {
+Map::head* Map::change(unsigned int xpos, unsigned int ypos, int type, head* pacceh) {
 	Map::head* px = &cur;
+	if (pacceh && pacceh->x <= xpos) px = pacceh;
 	while (px->pnext && px->pnext->x <= xpos) px = px->pnext;
 	if (px->x == xpos && px->pnode) {
 		Map::node* py = px->pnode;
@@ -74,11 +75,11 @@ void Map::change(unsigned int xpos, unsigned int ypos, int type) {
 	else if (type != 2) {											//If the row doesn't exist: insert Map::head and Map::node
 		Map::head* pn = insert(px);
 		Map::node* pnode = insert(pn->pnode);
-
 		pn->x = xpos;
 		pnode->y = ypos;
 		pnode->state = true;
 	}
+	return px;
 }
 
 void Map::calc() {
@@ -86,15 +87,24 @@ void Map::calc() {
 	clock_t ts = clock();
 #endif // DEBUG
 
-	Map::head* px = cur.pnext;
+	Map::head* px = cur.pnext, *pacce = nullptr, *ptmp = nullptr;
 	while (px) {
 		Map::node* py = px->pnode->pnext;
 		for (; py; py = py->pnext) {
 			if (!py->state) continue;
 			int x = px->x;
 			int y = py->y;
-			for (int i = x - 1; i <= x + 1; i++)
-				for (int j = y - 1; j <= y + 1; j++) add(i, j);
+			ptmp = pacce;
+			ptmp = add(x-1, y-1, ptmp);
+			pacce = ptmp;
+			add(x-1, y  , ptmp);
+			add(x-1, y+1, ptmp);
+			ptmp = add(x  , y-1, ptmp);
+			add(x  , y  , ptmp);
+			add(x  , y+1, ptmp);
+			ptmp = add(x+1, y-1, ptmp);
+			add(x+1, y  , ptmp);
+			add(x+1, y+1, ptmp);
 			mark(x, y);
 		}
 		px = px->pnext;
@@ -131,10 +141,10 @@ void Map::clear() {
 #else
 	memset(head_pool, 0, SIZE * sizeof(Map::head));
 	memset(node_pool, 0, SIZE * sizeof(Map::node));
-	for (int i = 0; i < SIZE; i++) head_pool[i].pnext = &head_pool[i + 1];
-	for (int i = 0; i < SIZE; i++) node_pool[i].pnext = &node_pool[i + 1];
-	head_pool[SIZE - 1].pnext = nullptr;  node_pool[SIZE - 1].pnext = nullptr;
-	cur.pnext = nullptr, nxt.pnext = nullptr, ppre = nullptr;
+	for (int i = 0; i < SIZE; i++) head_pool[i]->pnext = head_pool + i + 1;
+	for (int i = 0; i < SIZE; i++) node_pool[i]->pnext = node_pool + i + 1;
+	head_pool[SIZE - 1]->pnext = nullptr;  node_pool[SIZE - 1]->pnext = nullptr;
+	cur.pnext = nullptr, nxt.pnext = nullptr;
 	
 	redraw();
 
@@ -194,11 +204,23 @@ void Map::add_builtin(const unsigned int& xpos, const unsigned int& ypos, const 
 }
 
 void Map::add_delete_region(RECT& rect, bool isadd, bool isrand) {
-	for (int x = rect.left; x <= rect.right; x++) {
-		for (int y = rect.top; y <= rect.bottom; y++) {
-			if (isadd) change(x, y, (isrand ? (rand() % 2 ? 1 : 2) : 1));
-			else change(x, y, 2);
+	head* pacce = nullptr;
+	if (isadd) {
+		if (isrand) {
+			for (int x = rect.left; x <= rect.right; x++)
+				for (int y = rect.bottom; y >= rect.top; y--)
+					pacce = change(x, y, rand() % 3, pacce);
 		}
+		else {
+			for (int x = rect.left; x <= rect.right; x++)
+				for (int y = rect.bottom; y >= rect.top; y--)
+					pacce = change(x, y, 1, pacce);
+		}
+	}
+	else {
+		for (int x = rect.left; x <= rect.right; x++)
+			for (int y = rect.bottom; y >= rect.top; y--)
+				pacce = change(x, y, 2, pacce);
 	}
 }
 
@@ -349,7 +371,7 @@ void Map::dump(const char* fname) {
 	fclose(fout);
 }
 
-void Map::trial_auto_release()//ctrl+v£¨ÌÓ£© Ä¿µÄ£ºStopÊ±Çå¿Õhead_poolºÍnode_pool Bug:node_pool->pnext»áÄªÃûÆäÃî±ä³ÉNULL£¬²¢ÇÒ²»»áÔÚµ¥²½µ÷ÊÔµÄÊ±ºò³öÏÖÎÊÌâ
+void Map::trial_auto_release()//ctrl+vï¿½ï¿½ï¿½Ó£ï¿½ Ä¿ï¿½Ä£ï¿½StopÊ±ï¿½ï¿½ï¿½head_poolï¿½ï¿½node_pool Bug:node_pool->pnextï¿½ï¿½Äªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½NULLï¿½ï¿½ï¿½ï¿½ï¿½Ò²ï¿½ï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ôµï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 {
 	ppool* phead = phead_pools.pnext, * pdel = phead;
 	while (phead != nullptr) {
@@ -455,7 +477,7 @@ Map::head* Map::insert(Map::head* p) {
 #endif
 }
 
-Map::node* Map::insert(Map::node* p) {
+Map::node* Map::insert(node* p) {
 #ifdef REALTIME_NEW
 	node* pn = new node;
 	memset(pn, 0, sizeof(node));
@@ -534,13 +556,11 @@ void Map::del(Map::head* h) {
 #endif
 }
 
-void Map::add(unsigned int xpos, unsigned int ypos) {
+Map::head* Map::add(unsigned int xpos, unsigned int ypos, head* pacceh) {
 #ifdef REALTIME_NEW
-	ppre = nullptr;
 #endif
-	if (!ppre || !nxt.pnext) ppre = &nxt;
 	Map::head* px = &nxt;
-	if (ppre->pnext && ppre->pnext->x <= xpos) px = ppre;
+	if (pacceh &&  pacceh->x <= xpos) px = pacceh;
 	while (px->pnext && px->pnext->x <= xpos) px = px->pnext;
 	if (px->x == xpos && px->pnode) {
 		Map::node* py = px->pnode;
@@ -560,7 +580,7 @@ void Map::add(unsigned int xpos, unsigned int ypos) {
 		pnode->y = ypos;
 		pnode->count = 1;
 	}
-	ppre = px;
+	return px;
 }
 
 void Map::mark(unsigned int xpos, unsigned int ypos) {
