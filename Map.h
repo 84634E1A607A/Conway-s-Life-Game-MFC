@@ -13,20 +13,6 @@ inline void change_xpivot();
 inline void change_ypivot();
 
 class Map {
-public:
-	Map();
-	~Map();
-	void change(unsigned int xpos, unsigned int ypos, int type = 0);
-	void calc();
-	void clear();
-	void add_builtin(const unsigned int& xpos, const unsigned int& ypos, const unsigned int& b = selected_builtin, const unsigned int& d = selected_direction);
-	void add_delete_region(RECT&, bool, bool);
-	void draw(CDC& hdc, RECT& rect);
-	RECT get_builtin_info(int b = selected_builtin);
-	void draw_builtin(CDialog* Dlg, const unsigned int& b = selected_builtin, const unsigned int& d = selected_direction);
-	LPCTSTR get_size();
-	void load(const char*);
-	void dump(const char*);
 private:
 	struct node {
 		unsigned int y;
@@ -54,6 +40,32 @@ private:
 		ppool* pnext;
 	};
 
+private:
+	head cur;	//Current map
+	head nxt;	//Next map
+	head* head_pool;
+	node* node_pool;
+	int headpool_usage = 1, nodepool_usage = 1;
+	builtin builtins[10];
+	const int SIZE = 50;
+	ppool phead_pools, pnode_pools;
+
+public:
+	Map();
+	~Map();
+	head* change(unsigned int, unsigned int, int = 0, head* = nullptr);
+	void calc();
+	void clear();
+	void add_builtin(const unsigned int&, const unsigned int&, const unsigned int& = selected_builtin, const unsigned int& = selected_direction);
+	void add_delete_region(RECT&, bool, bool);
+	void draw(CDC& hdc, RECT& rect);
+	RECT get_builtin_info(int b = selected_builtin);
+	void draw_builtin(CDialog*, const unsigned int& = selected_builtin, const unsigned int& = selected_direction);
+	LPCTSTR get_size();
+	void load(const char*);
+	void dump(const char*);
+
+private:
 	head* enlarge_head_pool();
 	node* enlarge_node_pool();
 	inline void refresh_headpool_usage();
@@ -62,19 +74,10 @@ private:
 	node*insert(node*);
 	void del(node*);
 	void del(head*);
-	void add(unsigned int, unsigned int);
+	head* add(unsigned int, unsigned int, head* = nullptr);
 	void mark(unsigned int, unsigned int);
 	void clear(head*);
 	void init_builtins();
-	head cur;	//Current map
-	head nxt;	//Next map
-	head* ppre;
-	head* head_pool;
-	node* node_pool;
-	int headpool_usage = 1, nodepool_usage = 1;
-	builtin builtins[10];
-	const int SIZE = 50;
-	ppool phead_pools, pnode_pools;
 };
 
 
