@@ -141,9 +141,9 @@ void Map::clear() {
 #else
 	memset(head_pool, 0, SIZE * sizeof(Map::head));
 	memset(node_pool, 0, SIZE * sizeof(Map::node));
-	for (int i = 0; i < SIZE; i++) head_pool[i]->pnext = head_pool + i + 1;
-	for (int i = 0; i < SIZE; i++) node_pool[i]->pnext = node_pool + i + 1;
-	head_pool[SIZE - 1]->pnext = nullptr;  node_pool[SIZE - 1]->pnext = nullptr;
+	for (int i = 0; i < SIZE; i++) head_pool[i].pnext = head_pool + i + 1;
+	for (int i = 0; i < SIZE; i++) node_pool[i].pnext = node_pool + i + 1;
+	head_pool[SIZE - 1].pnext = nullptr;  node_pool[SIZE - 1].pnext = nullptr;
 	cur.pnext = nullptr, nxt.pnext = nullptr;
 	
 	redraw();
@@ -371,26 +371,31 @@ void Map::dump(const char* fname) {
 	fclose(fout);
 }
 
-void Map::trial_auto_release()//ctrl+v���ӣ� Ŀ�ģ�Stopʱ���head_pool��node_pool Bug:node_pool->pnext��Ī��������NULL�����Ҳ����ڵ������Ե�ʱ���������
-{
-	ppool* phead = phead_pools.pnext, * pdel = phead;
-	while (phead != nullptr) {
-		delete[] phead->phead;
-		phead = phead->pnext;
-		delete pdel;
-		pdel = phead;
-	}
-	phead_pools.pnext = nullptr;
-
-	ppool* pnode = pnode_pools.pnext; pdel = pnode;
-	while (pnode != nullptr) {
-		delete[] pnode->pnode;
-		pnode = pnode->pnext;
-		delete pdel;
-		pdel = pnode;
-	}
-	pnode_pools.pnext = nullptr;
-}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+//This is totally useless and destructive because the "cur" map need those nodes. They contain vital infomation. Clearing them can and is likely to lead to corruption.
+//The right way to clear memory is to store those info somewhere else, clear the memory, then restore those info.
+//One possible way is to create another table using struct POINT({x, y}) and traversal through the cur map (refer to Map::dump and Map::load).
+//void Map::trial_auto_release() 
+//{
+//	ppool* phead = phead_pools.pnext, * pdel = phead;
+//	while (phead != nullptr) {
+//		delete[] phead->phead;
+//		phead = phead->pnext;
+//		delete pdel;
+//		pdel = phead;
+//	}
+//	phead_pools.pnext = nullptr;
+//
+//	ppool* pnode = pnode_pools.pnext; pdel = pnode;
+//	while (pnode != nullptr) {
+//		delete[] pnode->pnode;
+//		pnode = pnode->pnext;
+//		delete pdel;
+//		pdel = pnode;
+//	}
+//	pnode_pools.pnext = nullptr;
+//}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Map::head* Map::enlarge_head_pool() {
 	Map::head* nhead_pool = new Map::head[SIZE];
