@@ -753,3 +753,4 @@ Map::~Map() {
 
 Map map;
 AD ad;
+MOUSEINFO mi;

@@ -35,6 +35,9 @@ public:
 	afx_msg void OnBnClickedRight();
 	afx_msg void OnChangeXpivot();
 	afx_msg void OnChangeYpivot();
+	afx_msg void OnBnClickedRadioclick();
+	afx_msg void OnBnClickedRadiopen();
+	afx_msg void OnBnClickedRadioeraser();
 };
 
 extern DlgOptions theDlg;

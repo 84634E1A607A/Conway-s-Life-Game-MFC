@@ -46,6 +46,9 @@ BEGIN_MESSAGE_MAP(DlgOptions, CDialogEx)
 	ON_BN_CLICKED(IDC_RIGHT, &DlgOptions::OnBnClickedRight)
 	ON_EN_CHANGE(IDC_XPIVOT, &DlgOptions::OnChangeXpivot)
 	ON_EN_CHANGE(IDC_YPIVOT, &DlgOptions::OnChangeYpivot)
+	ON_BN_CLICKED(IDC_RADIOCLICK, &DlgOptions::OnBnClickedRadioclick)
+	ON_BN_CLICKED(IDC_RADIOPEN, &DlgOptions::OnBnClickedRadiopen)
+	ON_BN_CLICKED(IDC_RADIOERASER, &DlgOptions::OnBnClickedRadioeraser)
 END_MESSAGE_MAP()
 
 
@@ -86,12 +89,16 @@ BOOL DlgOptions::OnInitDialog()
 	pSetY->SendMessage(EM_SETLIMITTEXT, 10, 0);
 	pSetY->SendMessage(WM_SETTEXT, 0, (LPARAM)L"08000000");
 
+	CWnd* pClick = GetDlgItem(IDC_RADIOCLICK);
+	pClick->SendMessage(WM_LBUTTONDOWN, 0, 0);
+	pClick->SendMessage(WM_LBUTTONUP, 0, 0);
+
 #ifdef REALTIME_NEW
 	SetDlgItemText(IDC_HEADPOOL_SIZE, L"1");
 	SetDlgItemText(IDC_NODEPOOL_SIZE, L"1");
 #else
-	SetDlgItemText(IDC_HEADPOOL_SIZE, map.get_size());
-	SetDlgItemText(IDC_NODEPOOL_SIZE, map.get_size());
+	SetDlgItemText(IDC_ACTUALHEADPOOLSIZE, map.get_size());
+	SetDlgItemText(IDC_ACTUALNODEPOOLSIZE, map.get_size());
 #endif
 	CloseHandle(CreateThread(NULL, 0, draw_first_builtin, this, 0, NULL));
 
@@ -228,4 +235,24 @@ void DlgOptions::OnChangeYpivot()
 		MessageBox(L"Y Pivot should be a value ranged (0, 0x10000000)", L"Error", MB_OK);
 	}
 	change_ypivot(), redraw();
+}
+
+
+void DlgOptions::OnBnClickedRadioclick()
+{
+	mi.isClick = true;
+}
+
+
+void DlgOptions::OnBnClickedRadiopen()
+{
+	mi.isClick = false;
+	mi.isPen = true;
+}
+
+
+void DlgOptions::OnBnClickedRadioeraser()
+{
+	mi.isClick = false;
+	mi.isPen = false;
 }

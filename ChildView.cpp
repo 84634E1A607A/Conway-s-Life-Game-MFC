@@ -31,6 +31,7 @@ BEGIN_MESSAGE_MAP(CChildView, CWnd)
 //	ON_WM_TIMER()
 	ON_WM_KEYDOWN()
 	ON_WM_RBUTTONDOWN()
+	ON_WM_MOUSEMOVE()
 	ON_WM_MOUSEWHEEL()
 END_MESSAGE_MAP()
 
@@ -149,6 +150,9 @@ void CChildView::OnLButtonDown(UINT nFlags, CPoint point)
 		}
 		}
 	}
+	else{
+		mi.pprev = { (LONG)(xc + xpivot), (LONG)(yc + ypivot) };
+	}
 	RedrawWindow(&crect, 0, RDW_INVALIDATE);
 	CWnd::OnLButtonDown(nFlags, point);
 }
@@ -168,6 +172,21 @@ void CChildView::OnRButtonDown(UINT nFlags, CPoint point)
 	//RedrawWindow(&crect, 0, RDW_INVALIDATE);
 	RedrawWindow(nullptr, nullptr, RDW_INVALIDATE);
 	CWnd::OnRButtonDown(nFlags, point);
+}
+
+void CChildView::OnMouseMove(UINT nFlags, CPoint point)    //bug:skip points when the cursor moves too fast
+{
+	if ((nFlags & MK_LBUTTON) && !mi.isClick) {
+		int xc = point.x / side_length, yc = point.y / side_length;
+		CPoint pcur = { (LONG)(xc + xpivot),(LONG)(yc + ypivot) };
+		if (pcur != mi.pprev) {
+			mi.pprev = pcur;
+			map.change(pcur.x, pcur.y, mi.isPen ? 1 : 2);
+			RECT crect = { xc * side_length + 1, yc * side_length + 1, (xc + 1) * side_length, (yc + 1) * side_length };
+			RedrawWindow(&crect, 0, RDW_INVALIDATE);
+		}
+	}
+	CWnd::OnMouseMove(nFlags, point);
 }
 
 

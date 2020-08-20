@@ -91,5 +91,12 @@ struct AD {
 	POINT p2 = { 0, 0 };
 };
 
+struct MOUSEINFO {
+	bool isClick = true; //default
+	bool isPen = true; //pen or eraser
+	CPoint pprev = { 0, 0 };
+};
+
 extern Map map;
 extern AD ad;
+extern MOUSEINFO mi;
