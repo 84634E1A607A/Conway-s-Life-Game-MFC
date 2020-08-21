@@ -120,7 +120,7 @@ void CChildView::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	// TODO: Add your message handler code here and/or call default
 	int xc = point.x / side_length, yc = point.y / side_length;
-	map.change(xc + xpivot, yc + ypivot);
+	map.change(xc + xpivot, yc + ypivot, (!mi.isClick && !mi.isPen) ? 2 : 0);
 	RECT crect = { xc * side_length + 1, yc * side_length + 1, (xc + 1) * side_length, (yc + 1) * side_length };
 	if (ad.adstate) {
 		switch (ad.count) {

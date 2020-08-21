@@ -8,6 +8,8 @@
 #define IDR_LifeTYPE                    130
 #define IDR_ACCELERATOR1                312
 #define IDD_DIALOG1                     313
+#define IDD_DIALOG2                     315
+#define IDD_HELP                        315
 #define IDC_STARTSTOP                   1000
 #define IDC_RESET                       1001
 #define IDC_SX                          1002
@@ -50,7 +52,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        315
+#define _APS_NEXT_RESOURCE_VALUE        317
 #define _APS_NEXT_COMMAND_VALUE         32785
 #define _APS_NEXT_CONTROL_VALUE         1025
 #define _APS_NEXT_SYMED_VALUE           311

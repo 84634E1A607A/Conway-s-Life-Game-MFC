@@ -183,6 +183,7 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="CHelpDlg.h" />
     <ClInclude Include="ChildView.h" />
     <ClInclude Include="DlgOptions.h" />
     <ClInclude Include="framework.h" />
@@ -194,6 +195,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CHelpDlg.cpp" />
     <ClCompile Include="ChildView.cpp" />
     <ClCompile Include="DlgOptions.cpp" />
     <ClCompile Include="Life-MFC.cpp" />

@@ -418,9 +418,9 @@ Map::head* Map::enlarge_head_pool() {
 Map::node* Map::enlarge_node_pool() {
 	Map::node* nnode_pool = new Map::node[SIZE];
 	memset(nnode_pool, 0, SIZE * sizeof(Map::node));
-	for (int i = 0; i < SIZE; i++) (nnode_pool + i)->pnext = nnode_pool + i + 1;
+	for (int i = 0; i < SIZE; i++) nnode_pool[i].pnext = nnode_pool + i + 1;
 
-	(nnode_pool + SIZE - 1)->pnext = nullptr;
+	nnode_pool[SIZE - 1].pnext = nullptr;
 	node_pool->pnext = nnode_pool;
 
 	ppool* npnode_pool = new ppool;

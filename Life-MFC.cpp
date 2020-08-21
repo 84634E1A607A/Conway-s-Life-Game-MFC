@@ -10,6 +10,7 @@
 #include "MainFrm.h"
 #include "DlgOptions.h"
 #include "Map.h"
+#include "CHelpDlg.h"
 
 
 #ifdef _DEBUG
@@ -173,6 +174,6 @@ void CLifeMFCApp::OnOptionsSave()
 
 void CLifeMFCApp::OnHelpHelp()
 {
-	m_pMainWnd->MessageBox(L"Help:\n\nspace - start/stop\nleftclick - select/unselect\nrightclick - deploy builtin\nb, 0-3 - select builtin\nd, 0-7 - select direction\nOptions->C/D - Click two points to create/delete a rectangle region",
-		L"Help", MB_OK);
+	CHelpDlg helpdlg;
+	helpdlg.DoModal();
 }
