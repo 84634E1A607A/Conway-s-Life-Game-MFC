@@ -146,6 +146,7 @@ void CLifeMFCApp::OnAppAbout()
 void CLifeMFCApp::OnViewOptions()
 {
 	theDlg.ShowWindow(SW_SHOW);
+	AfxBeginThread(draw_first_builtin, &theDlg);
 }
 
 

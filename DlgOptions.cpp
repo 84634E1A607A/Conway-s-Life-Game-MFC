@@ -9,13 +9,12 @@
 #include "MainFrm.h"
 extern Map map;
 
-
 // DlgOptions dialog
 DlgOptions theDlg;
 
 IMPLEMENT_DYNAMIC(DlgOptions, CDialogEx)
 
-DWORD WINAPI draw_first_builtin(LPVOID Dlg) { Sleep(500); map.draw_builtin((CDialog*)Dlg); return 0; }
+UINT draw_first_builtin(LPVOID Dlg) { Sleep(10); map.draw_builtin((CDialog*)Dlg);  return 0; }
 
 DlgOptions::DlgOptions(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_OPTIONS, pParent)
@@ -100,7 +99,7 @@ BOOL DlgOptions::OnInitDialog()
 	SetDlgItemText(IDC_ACTUALHEADPOOLSIZE, map.get_size());
 	SetDlgItemText(IDC_ACTUALNODEPOOLSIZE, map.get_size());
 #endif
-	CloseHandle(CreateThread(NULL, 0, draw_first_builtin, this, 0, NULL));
+	AfxBeginThread(draw_first_builtin, this);
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 				  // EXCEPTION: OCX Property Pages should return FALSE
