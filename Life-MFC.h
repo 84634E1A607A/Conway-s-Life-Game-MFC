@@ -30,7 +30,6 @@ public:
 public:
 	afx_msg void OnAppAbout();
 	afx_msg void OnViewOptions();
-	afx_msg void OnHelp();
 	DECLARE_MESSAGE_MAP()
 	afx_msg void OnOptionsOpen();
 	afx_msg void OnOptionsSave();

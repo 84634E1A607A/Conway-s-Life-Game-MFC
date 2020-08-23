@@ -231,6 +231,7 @@ void CChildView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 	}
 	case VK_SPACE: {
 		started = !started;
+		if (!started) map.free_extra();
 		break;
 	}
 	case 'B': {

@@ -368,6 +368,34 @@ void Map::dump(const char* fname) {
 	fclose(fout);
 }
 
+void Map::free_extra() {
+	struct POINT_LINK { POINT point; POINT_LINK* pnext; } 
+		point_link_head = { {0,0}, nullptr }, * point_link_end = &point_link_head, * point_link_node = &point_link_head, *point_link_del;
+	head* ph = &cur;
+	while (ph->pnext) {
+		ph = ph->pnext;
+		unsigned int x = ph->x;
+		node* pn = ph->pnode;
+		while (pn->pnext) {
+			pn = pn->pnext;
+			if (!pn->state) continue;
+			point_link_end = point_link_end->pnext = new POINT_LINK;
+			point_link_end->point = { (long)x, (long)pn->y }, point_link_end->pnext = nullptr;
+		}
+	}
+	clear();
+	while (point_link_node->pnext) {
+		point_link_node = point_link_node->pnext;
+		change(point_link_node->point.x, point_link_node->point.y);
+	}
+	point_link_node = point_link_head.pnext;
+	while (point_link_node) {
+		point_link_del = point_link_node;
+		point_link_node = point_link_node->pnext;
+		delete point_link_del;
+	}
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 //This is totally useless and destructive because the "cur" map need those nodes. They contain vital infomation. Clearing them can and is likely to lead to corruption.
 //The right way to clear memory is to store those info somewhere else, clear the memory, then restore those info.
