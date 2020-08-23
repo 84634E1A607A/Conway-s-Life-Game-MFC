@@ -257,15 +257,12 @@ void Map::draw_builtin(CDialog* Dlg, const unsigned int& b, const unsigned int& 
 	const int xl = 71, yl = 58;
 	CWnd* hPreview = Dlg->GetDlgItem(IDC_PREVIEW);
 	if (!hPreview) return;
-	const static HBRUSH black_brush = (HBRUSH)GetStockObject(BLACK_BRUSH);
-	const static HBRUSH white_brush = (HBRUSH)GetStockObject(LTGRAY_BRUSH);
-	const static HBRUSH red_brush = CreateSolidBrush(RGB(255, 0, 0));
 	const builtin& bi = builtins[b];
-	HDC hdc = hPreview->GetDC()->m_hDC;
+	CDC* dc = hPreview->GetDC();
 
 	//Clear
 	RECT erase_rect = { 1, 1, xl, yl };
-	FillRect(hdc, &erase_rect, white_brush);
+	dc->FillSolidRect(&erase_rect, RGB(255, 255, 255));
 	if (b >= 10 || d >= 8 || !bi.size) return;
 
 	//Calc
@@ -296,10 +293,10 @@ void Map::draw_builtin(CDialog* Dlg, const unsigned int& b, const unsigned int& 
 			break;
 		}
 		RECT rect = { x * r + xs, y * r + ys, (x + 1) * r + xs, (y + 1) * r + ys };
-		FillRect(hdc, &rect, black_brush);
+		dc->FillSolidRect(&rect, RGB(0, 0, 0));
 	}
 	RECT click_rect = { xs, ys, xs + r, ys + r };
-	FillRect(hdc, &click_rect, red_brush);
+	dc->FillSolidRect(&click_rect, RGB(255, 0, 0));
 }
 
 LPCTSTR Map::get_size() {
@@ -328,7 +325,7 @@ void Map::load(const char* fname) {
 			fread_s(&x, sizeof(x), sizeof(x), 1, fin);
 			fread_s(&y, sizeof(y), sizeof(y), 1, fin);
 			if (x == 0xffffffff && y == 0xfffffffd) break;
-			if (ferror(fin)) {
+			if (ferror(fin) || feof(fin)) {
 				clear();
 				fclose(fin);
 				throw L"Bad file! Map reset";
