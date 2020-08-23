@@ -14,7 +14,6 @@ DlgOptions theDlg;
 
 IMPLEMENT_DYNAMIC(DlgOptions, CDialogEx)
 
-UINT draw_first_builtin(LPVOID Dlg) { Sleep(10); map.draw_builtin((CDialog*)Dlg);  return 0; }
 
 DlgOptions::DlgOptions(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_OPTIONS, pParent)
@@ -100,7 +99,6 @@ BOOL DlgOptions::OnInitDialog()
 	SetDlgItemText(IDC_ACTUALHEADPOOLSIZE, map.get_size());
 	SetDlgItemText(IDC_ACTUALNODEPOOLSIZE, map.get_size());
 #endif
-	AfxBeginThread(draw_first_builtin, this);
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 				  // EXCEPTION: OCX Property Pages should return FALSE
