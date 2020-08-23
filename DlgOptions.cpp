@@ -261,4 +261,5 @@ void DlgOptions::OnBnClickedRadioeraser()
 void DlgOptions::OnPaint()
 {
 	map.draw_builtin(this);
+	CDialogEx::OnPaint();
 }
