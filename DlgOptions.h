@@ -42,5 +42,3 @@ public:
 };
 
 extern DlgOptions theDlg;
-
-UINT draw_first_builtin(LPVOID Dlg);
