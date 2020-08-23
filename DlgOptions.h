@@ -38,6 +38,7 @@ public:
 	afx_msg void OnBnClickedRadioclick();
 	afx_msg void OnBnClickedRadiopen();
 	afx_msg void OnBnClickedRadioeraser();
+	afx_msg void OnPaint();
 };
 
 extern DlgOptions theDlg;
