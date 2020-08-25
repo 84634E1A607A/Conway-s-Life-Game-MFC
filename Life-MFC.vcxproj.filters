@@ -45,6 +45,9 @@
     <ClInclude Include="CHelpDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CAboutDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Life-MFC.cpp">

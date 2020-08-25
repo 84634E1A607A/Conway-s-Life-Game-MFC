@@ -11,6 +11,7 @@
 #include "DlgOptions.h"
 #include "Map.h"
 #include "CHelpDlg.h"
+#include "CAboutDlg.h"
 
 
 #ifdef _DEBUG
@@ -83,6 +84,7 @@ BOOL CLifeMFCApp::InitInstance()
 	pFrame->UpdateWindow();
 
 	theDlg.Create(IDD_OPTIONS);
+	pFrame->SetFocus();
 	//theDlg.ShowWindow(SW_SHOW);
 
 	return TRUE;
@@ -97,21 +99,8 @@ int CLifeMFCApp::ExitInstance()
 // CLifeMFCApp message handlers
 
 
-// CAboutDlg dialog used for App About
 
-class CAboutDlg : public CDialogEx
-{
-public:
-	CAboutDlg() noexcept;
 
-// Dialog Data
-#ifdef AFX_DESIGN_TIME
-	enum { IDD = IDD_ABOUTBOX };
-#endif
-
-protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-};
 
 CAboutDlg::CAboutDlg() noexcept : CDialogEx(IDD_ABOUTBOX)
 {

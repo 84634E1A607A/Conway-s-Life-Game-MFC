@@ -183,6 +183,7 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="CAboutDlg.h" />
     <ClInclude Include="CHelpDlg.h" />
     <ClInclude Include="ChildView.h" />
     <ClInclude Include="DlgOptions.h" />

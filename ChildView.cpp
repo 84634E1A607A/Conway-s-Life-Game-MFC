@@ -8,11 +8,12 @@
 #include "ChildView.h"
 #include "map.h"
 #include "DlgOptions.h"
+#include "CHelpDlg.h"
+#include "CAboutDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
-
 
 // CChildView
 
@@ -228,6 +229,10 @@ void CChildView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 		if (!started) map.free_extra();
 		break;
 	}
+	case VK_TAB: {
+		if (theDlg.IsWindowVisible())theDlg.SetFocus();
+		break;
+	}
 	case 'B': {
 		kbd_input_state = 1;
 		break;
@@ -239,6 +244,31 @@ void CChildView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 	case 'C': {
 		bool isvisible = theDlg.IsWindowVisible();
 		theDlg.ShowWindow(isvisible ? SW_HIDE : SW_SHOWNOACTIVATE);
+		break;
+	}
+	case 'F': {
+		if (TIMER > 5)TIMER -= 5;
+		else TIMER = 1;
+		theApp.m_pMainWnd->SetTimer(1, TIMER, NULL);
+		theDlg.SetDlgItemInt(IDC_TIMER, TIMER, FALSE);
+		break;
+	}
+	case 'S': {
+		if (TIMER <= 99994)TIMER += 5;
+		else TIMER = 99999;
+		theApp.m_pMainWnd->SetTimer(1, TIMER, NULL);
+		theDlg.SetDlgItemInt(IDC_TIMER, TIMER, FALSE);
+		break;
+	}
+	case 'H': {
+		CHelpDlg helpdlg;
+		helpdlg.DoModal();
+		break;
+	}
+	case 'A': {
+		CAboutDlg aboutdlg;
+		aboutdlg.DoModal();
+		break;
 	}
 	case '0':
 	case '1':
