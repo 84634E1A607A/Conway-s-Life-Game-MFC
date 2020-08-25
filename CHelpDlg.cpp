@@ -41,6 +41,15 @@ BOOL CHelpDlg::OnInitDialog()
 
 	Sitelist.AddString(L"baike.baidu.com");
 	Sitelist.AddString(L"wikipedia.org");
+	SetDlgItemText(IDC_HELPSTR, 
+		L"space \t\t- start/stop\r\n\
+leftclick \t\t- select/unselect (Click) / draw (Pen) / erase (Eraser)\r\n\
+rightclick \t\t- deploy builtin\r\n\
+b, 0-3 \t\t- select builtin\r\n\
+d, 0-7 \t\t- select direction\r\n\
+c \t\t- Show/hide Control Dialog\r\n\
+Options->C/D \t- Click two points to create/delete a rectangle region\r\n\
+Find more interesting seeds in ./seeds");
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 				  // EXCEPTION: OCX Property Pages should return FALSE

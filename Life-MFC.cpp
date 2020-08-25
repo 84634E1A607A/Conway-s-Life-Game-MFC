@@ -94,7 +94,7 @@ BOOL CLifeMFCApp::InitInstance()
 	// m_pMainWnd->DragAcceptFiles();
 
 	theDlg.Create(IDD_OPTIONS);
-	theDlg.ShowWindow(SW_SHOW);
+	//theDlg.ShowWindow(SW_SHOW);
 
 	pFrame->SetFocus();
 

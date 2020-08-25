@@ -38,6 +38,8 @@
 #define IDC_ACTUALNODEPOOLSIZE          1024
 #define IDC_BUTTON1                     1027
 #define IDC_SITELIST                    1028
+#define IDC_HELPSTR                     1029
+#define IDC_EDIT2                       1030
 #define ID_VIEW                         32772
 #define ID_VIEW_OPTIONS                 32773
 #define ID_OPTIONS_OPEN                 32776
@@ -56,7 +58,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        317
 #define _APS_NEXT_COMMAND_VALUE         32785
-#define _APS_NEXT_CONTROL_VALUE         1029
+#define _APS_NEXT_CONTROL_VALUE         1031
 #define _APS_NEXT_SYMED_VALUE           311
 #endif
 #endif
