@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ 生成的包含文件。
-// 供 LifeMFC.rc 使用
+// Microsoft Visual C++ generated include file.
+// Used by LifeMFC.rc
 //
 #define IDD_OPTIONS                     7
 #define IDD_ABOUTBOX                    100
@@ -36,6 +36,8 @@
 #define IDC_RADIOERASER                 1022
 #define IDC_ACTUALHEADPOOLSIZE          1023
 #define IDC_ACTUALNODEPOOLSIZE          1024
+#define IDC_BUTTON1                     1027
+#define IDC_SITELIST                    1028
 #define ID_VIEW                         32772
 #define ID_VIEW_OPTIONS                 32773
 #define ID_OPTIONS_OPEN                 32776
@@ -54,7 +56,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        317
 #define _APS_NEXT_COMMAND_VALUE         32785
-#define _APS_NEXT_CONTROL_VALUE         1025
+#define _APS_NEXT_CONTROL_VALUE         1029
 #define _APS_NEXT_SYMED_VALUE           311
 #endif
 #endif

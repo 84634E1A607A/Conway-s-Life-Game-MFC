@@ -18,4 +18,10 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX);
 
 	DECLARE_MESSAGE_MAP()
+public:
+	virtual BOOL OnInitDialog();
+private:
+	CListBox Sitelist;
+public:
+	afx_msg void OnBnClickedButton1();
 };
