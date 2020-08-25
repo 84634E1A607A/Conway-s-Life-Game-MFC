@@ -57,10 +57,7 @@ void CChildView::OnPaint()
 {
 	extern int side_length;
 
-#ifdef DEBUG
 	clock_t ts = clock();
-#endif // DEBUG
-
 
 	CPaintDC dc(this); // device context for painting
 
@@ -98,15 +95,12 @@ void CChildView::OnPaint()
 	dc.BitBlt(0, 0, CliRect.right, CliRect.bottom, &mdc, 0, 0, SRCCOPY);
 	mdc.DeleteDC();
 	bmp.DeleteObject();
-
-#ifdef DEBUG
 	clock_t te = clock();
 	clock_t t = te - ts;
 	TCHAR s[16];
 	_itow_s(t, s, 10);
 	if (theDlg.GetSafeHwnd())
-		theDlg.SetDlgItemText(IDC_HEADPOOL_SIZE, s);
-#endif // DEBUG
+		theDlg.SetDlgItemText(IDC_PAINT_TIME, s);
 }
 
 //BOOL CChildView::OnEraseBkgnd(CDC* pDC)

@@ -5,8 +5,6 @@
 #define IDD_OPTIONS                     7
 #define IDD_ABOUTBOX                    100
 #define IDR_MAINFRAME                   128
-#define IDR_LifeTYPE                    130
-#define IDR_ACCELERATOR1                312
 #define IDD_DIALOG1                     313
 #define IDD_DIALOG2                     315
 #define IDD_HELP                        315
@@ -23,23 +21,22 @@
 #define IDC_OK                          1009
 #define IDC_UP                          1010
 #define IDC_NODEPOOL_USAGE              1011
-#define IDC_NODEPOOL_SIZE               1012
+#define IDC_CALC_TIME                   1012
 #define IDC_XPIVOT                      1013
 #define IDC_DOWN                        1014
 #define IDC_LEFT                        1015
 #define IDC_YPIVOT                      1016
 #define IDC_HEADPOOL_USAGE              1017
-#define IDC_HEADPOOL_SIZE               1018
+#define IDC_PAINT_TIME                  1018
 #define IDC_RIGHT                       1019
 #define IDC_RADIOCLICK                  1020
 #define IDC_RADIOPEN                    1021
 #define IDC_RADIOERASER                 1022
 #define IDC_ACTUALHEADPOOLSIZE          1023
 #define IDC_ACTUALNODEPOOLSIZE          1024
-#define IDC_BUTTON1                     1027
+#define IDC_SITE_GO                     1027
 #define IDC_SITELIST                    1028
 #define IDC_HELPSTR                     1029
-#define IDC_EDIT2                       1030
 #define ID_VIEW                         32772
 #define ID_VIEW_OPTIONS                 32773
 #define ID_OPTIONS_OPEN                 32776
@@ -50,7 +47,6 @@
 #define ID_CREATE_DELETE                32781
 #define ID_HELP_HELP                    32782
 #define ID_HELP_ABOUT                   32783
-#define ID_HAPP_ABOUT                   32784
 
 // Next default values for new objects
 // 

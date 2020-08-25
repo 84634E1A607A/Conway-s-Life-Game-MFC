@@ -28,7 +28,7 @@ void CHelpDlg::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(CHelpDlg, CDialogEx)
-	ON_BN_CLICKED(IDC_BUTTON1, &CHelpDlg::OnBnClickedButton1)
+	ON_BN_CLICKED(IDC_SITE_GO, &CHelpDlg::OnBnClickedGo)
 END_MESSAGE_MAP()
 
 
@@ -56,7 +56,7 @@ Find more interesting seeds in ./seeds");
 }
 
 
-void CHelpDlg::OnBnClickedButton1()
+void CHelpDlg::OnBnClickedGo()
 {
 	CString txt;
 	int cursel = Sitelist.GetCurSel();

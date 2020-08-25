@@ -83,9 +83,7 @@ Map::head* Map::change(unsigned int xpos, unsigned int ypos, int type, head* pac
 }
 
 void Map::calc() {
-#ifdef DEBUG
 	clock_t ts = clock();
-#endif // DEBUG
 
 	Map::head* px = cur.pnext, *pacce = nullptr, *ptmp = nullptr;
 	while (px) {
@@ -117,14 +115,12 @@ void Map::calc() {
 		px = px->pnext;
 	}
 	clear(&nxt);
-#ifdef DEBUG
 	clock_t te = clock();
 	clock_t t = te - ts;
 	TCHAR s[16];
 	_itow_s(t, s, 10);
 	if (theDlg.GetSafeHwnd())
-		theDlg.SetDlgItemText(IDC_NODEPOOL_SIZE, s);
-#endif // DEBUG
+		theDlg.SetDlgItemText(IDC_CALC_TIME, s);
 }
 
 void Map::clear() {
