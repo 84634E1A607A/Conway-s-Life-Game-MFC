@@ -78,25 +78,12 @@ BOOL CLifeMFCApp::InitInstance()
 		WS_OVERLAPPEDWINDOW, nullptr,
 		nullptr);
 
-
-	// Enable DDE Execute open
-	// EnableShellOpen();
-	// cRegisterShellFileTypes(TRUE);
-
-
-
 	// The one and only window has been initialized, so show and update it
 	pFrame->ShowWindow(SW_SHOW);
 	pFrame->UpdateWindow();
-	// call DragAcceptFiles only if there's a suffix
-	//  In an SDI app, this should occur after ProcessShellCommand
-	// Enable drag/drop open
-	// m_pMainWnd->DragAcceptFiles();
 
 	theDlg.Create(IDD_OPTIONS);
 	//theDlg.ShowWindow(SW_SHOW);
-
-	pFrame->SetFocus();
 
 	return TRUE;
 }
@@ -147,8 +134,7 @@ void CLifeMFCApp::OnAppAbout()
 
 void CLifeMFCApp::OnViewOptions()
 {
-	theDlg.ShowWindow(SW_SHOW);
-	m_pMainWnd->SetFocus();
+	theDlg.ShowWindow(SW_SHOWNOACTIVATE);
 }
 
 

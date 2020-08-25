@@ -40,7 +40,7 @@ public:
 	afx_msg void OnBnClickedRadioeraser();
 	afx_msg void OnPaint();
 
-	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
+//	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 };
 
 extern DlgOptions theDlg;

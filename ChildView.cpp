@@ -244,8 +244,7 @@ void CChildView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 	}
 	case 'C': {
 		bool isvisible = theDlg.IsWindowVisible();
-		theDlg.ShowWindow(isvisible ? SW_HIDE : SW_SHOW);
-		SetFocus();
+		theDlg.ShowWindow(isvisible ? SW_HIDE : SW_SHOWNOACTIVATE);
 	}
 	case '0':
 	case '1':
