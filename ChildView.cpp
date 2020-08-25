@@ -242,6 +242,11 @@ void CChildView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 		kbd_input_state = 2;
 		break;
 	}
+	case 'C': {
+		bool isvisible = theDlg.IsWindowVisible();
+		theDlg.ShowWindow(isvisible ? SW_HIDE : SW_SHOW);
+		SetFocus();
+	}
 	case '0':
 	case '1':
 	case '2':

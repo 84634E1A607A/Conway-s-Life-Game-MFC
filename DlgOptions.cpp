@@ -48,6 +48,7 @@ BEGIN_MESSAGE_MAP(DlgOptions, CDialogEx)
 	ON_BN_CLICKED(IDC_RADIOPEN, &DlgOptions::OnBnClickedRadiopen)
 	ON_BN_CLICKED(IDC_RADIOERASER, &DlgOptions::OnBnClickedRadioeraser)
 	ON_WM_PAINT()
+	ON_WM_KEYDOWN()
 END_MESSAGE_MAP()
 
 
@@ -261,4 +262,19 @@ void DlgOptions::OnPaint()
 {
 	map.draw_builtin(this);
 	CDialogEx::OnPaint();
+}
+
+
+void DlgOptions::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
+{
+	switch (nChar)
+	{
+	case 'C': {
+		ShowWindow(SW_HIDE);
+		break;
+	}
+	default:
+		break;
+	}
+	CDialogEx::OnKeyDown(nChar, nRepCnt, nFlags);
 }

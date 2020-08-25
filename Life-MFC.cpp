@@ -96,6 +96,8 @@ BOOL CLifeMFCApp::InitInstance()
 	theDlg.Create(IDD_OPTIONS);
 	theDlg.ShowWindow(SW_SHOW);
 
+	pFrame->SetFocus();
+
 	return TRUE;
 }
 
@@ -146,6 +148,7 @@ void CLifeMFCApp::OnAppAbout()
 void CLifeMFCApp::OnViewOptions()
 {
 	theDlg.ShowWindow(SW_SHOW);
+	m_pMainWnd->SetFocus();
 }
 
 
