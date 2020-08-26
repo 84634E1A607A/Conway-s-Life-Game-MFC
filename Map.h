@@ -62,8 +62,10 @@ public:
 	RECT get_builtin_info(int b = selected_builtin);
 	void draw_builtin(CDialog*, const unsigned int& = selected_builtin, const unsigned int& = selected_direction);
 	LPCTSTR get_size();
-	void load(const char*);
-	void dump(const char*);
+	//void load(const char*);
+	void load(CString&);
+	//void dump(const char*);
+	void dump(CString&);
 	void free_extra();
 	//void trial_auto_release();
 

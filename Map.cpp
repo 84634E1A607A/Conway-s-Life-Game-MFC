@@ -301,7 +301,7 @@ LPCTSTR Map::get_size() {
 	return size;
 }
 
-void Map::load(const char* fname) {
+/*void Map::load(const char* fname) {
 	try {
 		FILE* fin;
 		fopen_s(&fin, fname, "rb");
@@ -334,9 +334,48 @@ void Map::load(const char* fname) {
 	catch (const LPCTSTR msg) {
 		theApp.m_pMainWnd->MessageBox(msg, L"Error", MB_OK);
 	}
+}*/
+
+void Map::load(CString& fname)
+{
+	try
+	{
+		CFile file;
+		if (!file.Open(fname.GetString(), CFile::modeRead))
+		{
+			throw L"Cannot open file";
+		}
+		clear();
+		file.Read(&xpivot, sizeof(xpivot));
+		file.Read(&ypivot, sizeof(ypivot));
+		unsigned int tmp;
+		file.Read(&tmp, sizeof(tmp));
+		if (tmp != 0xffffffff)
+		{
+			clear();
+			throw L"Bad file! Map reset";
+		}
+		while (true) {
+			unsigned int x, y, m, n;
+			m = file.Read(&x, sizeof(x));
+			n = file.Read(&y, sizeof(y));
+			if (x == 0xffffffff && y == 0xfffffffd) break;
+			if (!m || !n) {
+				clear();
+				throw L"Bad file! Map reset";
+			}
+			change(x, y);
+		}
+		redraw();
+	}
+	catch (const LPCTSTR msg) 
+	{
+		theApp.m_pMainWnd->MessageBox(msg, L"Error", MB_OK);
+	}
+
 }
 
-void Map::dump(const char* fname) {
+/*void Map::dump(const char* fname) {
 	started = false;
 	FILE* fout;
 	fopen_s(&fout, fname, "wb");
@@ -362,6 +401,34 @@ void Map::dump(const char* fname) {
 	}
 	fwrite(tmp, sizeof(tmp), 1, fout);
 	fclose(fout);
+}*/
+
+void Map::dump(CString& fname)
+{
+	started = false;
+	CFile file;
+	if (!file.Open(fname.GetString(), CFile::modeWrite))
+	{
+		theApp.m_pMainWnd->MessageBox(L"Save File Failed!", L"Error", MB_OK);
+		return;
+	}
+	unsigned int tmp[2] = { 0xffffffff, 0xfffffffd };
+	file.Write(&xpivot, sizeof(xpivot));
+	file.Write(&ypivot, sizeof(ypivot));
+	file.Write(tmp, sizeof(tmp[0]));
+	Map::head* ph = &cur;
+	while (ph->pnext) {
+		ph = ph->pnext;
+		unsigned int x = ph->x;
+		Map::node* pn = ph->pnode;
+		while (pn->pnext) {
+			pn = pn->pnext;
+			if (!pn->state) continue;
+			file.Write(&x, sizeof(x));
+			file.Write(&(pn->y), sizeof(pn->y));
+		}
+	}
+	file.Write(tmp, sizeof(tmp));
 }
 
 void Map::free_extra() {

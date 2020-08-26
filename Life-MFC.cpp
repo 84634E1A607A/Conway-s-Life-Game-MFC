@@ -133,9 +133,10 @@ void CLifeMFCApp::OnOptionsOpen()
 	if (!fOpenDlg.DoModal()) return;
 	CString fname = fOpenDlg.GetPathName();
 	if (!fname.GetLength()) return;
-	char fnameA[256] = "";
+	map.load(fname);
+	/*char fnameA[256] = "";
 	wsprintfA(fnameA, "%ws", fname.GetString());
-	map.load(fnameA);
+	map.load(fnameA);*/
 }
 
 
@@ -145,9 +146,10 @@ void CLifeMFCApp::OnOptionsSave()
 	if (!fSaveDlg.DoModal()) return;
 	CString fname = fSaveDlg.GetPathName();
 	if (!fname.GetLength()) return;
-	char fnameA[256] = "";
+	map.dump(fname);
+	/*char fnameA[256] = "";
 	wsprintfA(fnameA, "%ws", fname.GetString());
-	map.dump(fnameA);
+	map.dump(fnameA);*/
 }
 
 void CLifeMFCApp::OnHelpHelp()
