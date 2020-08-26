@@ -48,6 +48,7 @@ public:
 	afx_msg void OnCreateDelete();
 	afx_msg void OnCreateRandom();
 	afx_msg void OnCreateRectangle();
+	afx_msg void OnDropFiles(HDROP hDropInfo);
 };
 
 

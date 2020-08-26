@@ -67,6 +67,7 @@ BOOL CLifeMFCApp::InitInstance()
 	// such as the name of your company or organization
 	// SetRegistryKey(_T("Local AppWizard-Generated Applications"));
 
+	
 
 	// To create the main window, this code creates a new frame window
 	// object and then sets it as the application's main window object
@@ -83,9 +84,16 @@ BOOL CLifeMFCApp::InitInstance()
 	pFrame->ShowWindow(SW_SHOW);
 	pFrame->UpdateWindow();
 
+	m_pMainWnd->DragAcceptFiles();
+
 	theDlg.Create(IDD_OPTIONS);
 	pFrame->SetFocus();
 	//theDlg.ShowWindow(SW_SHOW);
+
+	if (m_lpCmdLine[0] != '\0')
+	{
+		map.load(CString(m_lpCmdLine));
+	}
 
 	return TRUE;
 }
