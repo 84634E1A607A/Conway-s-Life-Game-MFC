@@ -48,6 +48,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;
 	}
 	SetTimer(1, TIMER, NULL);
+	m_hAccel = ::LoadAccelerators(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_ACCELERATOR1));
 	return 0;
 }
 
@@ -61,6 +62,13 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 	cs.dwExStyle &= ~WS_EX_CLIENTEDGE;
 	cs.lpszClass = AfxRegisterWndClass(0);
 	return TRUE;
+}
+
+BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
+{
+	if (::TranslateAccelerator(GetSafeHwnd(), m_hAccel, pMsg))
+		return TRUE;
+	return CFrameWnd::PreTranslateMessage(pMsg);
 }
 
 // CMainFrame diagnostics

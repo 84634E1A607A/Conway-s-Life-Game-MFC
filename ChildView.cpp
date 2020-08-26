@@ -35,6 +35,9 @@ BEGIN_MESSAGE_MAP(CChildView, CWnd)
 	ON_WM_RBUTTONDOWN()
 	ON_WM_MOUSEMOVE()
 	ON_WM_MOUSEWHEEL()
+	ON_COMMAND(ID_FASTER, &CChildView::OnFaster)
+	ON_COMMAND(ID_SLOWER, &CChildView::OnSlower)
+	ON_COMMAND(ID_CONTROLWND, &CChildView::OnControlwnd)
 END_MESSAGE_MAP()
 
 
@@ -241,35 +244,6 @@ void CChildView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 		kbd_input_state = 2;
 		break;
 	}
-	case 'C': {
-		bool isvisible = theDlg.IsWindowVisible();
-		theDlg.ShowWindow(isvisible ? SW_HIDE : SW_SHOWNOACTIVATE);
-		break;
-	}
-	case 'F': {
-		if (TIMER > 5)TIMER -= 5;
-		else TIMER = 1;
-		theApp.m_pMainWnd->SetTimer(1, TIMER, NULL);
-		theDlg.SetDlgItemInt(IDC_TIMER, TIMER, FALSE);
-		break;
-	}
-	case 'S': {
-		if (TIMER <= 99994)TIMER += 5;
-		else TIMER = 99999;
-		theApp.m_pMainWnd->SetTimer(1, TIMER, NULL);
-		theDlg.SetDlgItemInt(IDC_TIMER, TIMER, FALSE);
-		break;
-	}
-	case 'H': {
-		CHelpDlg helpdlg;
-		helpdlg.DoModal();
-		break;
-	}
-	case 'A': {
-		CAboutDlg aboutdlg;
-		aboutdlg.DoModal();
-		break;
-	}
 	case '0':
 	case '1':
 	case '2':
@@ -311,4 +285,29 @@ BOOL CChildView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 		pScale->SetWindowText(str);
 	}
 	return CWnd::OnMouseWheel(nFlags, zDelta, pt);
+}
+
+
+void CChildView::OnFaster()
+{
+	if (TIMER > 5)TIMER -= 5;
+	else TIMER = 1;
+	theApp.m_pMainWnd->SetTimer(1, TIMER, NULL);
+	theDlg.SetDlgItemInt(IDC_TIMER, TIMER, FALSE);
+}
+
+
+void CChildView::OnSlower()
+{
+	if (TIMER <= 99994)TIMER += 5;
+	else TIMER = 99999;
+	theApp.m_pMainWnd->SetTimer(1, TIMER, NULL);
+	theDlg.SetDlgItemInt(IDC_TIMER, TIMER, FALSE);
+}
+
+
+void CChildView::OnControlwnd()
+{
+	bool isvisible = theDlg.IsWindowVisible();
+	theDlg.ShowWindow(isvisible ? SW_HIDE : SW_SHOWNOACTIVATE);
 }

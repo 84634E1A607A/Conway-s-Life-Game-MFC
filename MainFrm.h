@@ -22,6 +22,7 @@ public:
 // Overrides
 public:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	virtual BOOL OnCmdMsg(UINT nID, int nCode, void* pExtra, AFX_CMDHANDLERINFO* pHandlerInfo);
 
 // Implementation
@@ -35,6 +36,7 @@ public:
 protected:
 	CToolBar          m_wndToolBar;
 	CChildView    m_wndView;
+	HACCEL m_hAccel;
 
 // Generated message map functions
 protected:
