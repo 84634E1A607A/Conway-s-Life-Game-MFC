@@ -17,6 +17,9 @@ public:
 #endif
 
 protected:
+	HACCEL m_hAccel;
+
+protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
 	DECLARE_MESSAGE_MAP()
@@ -39,6 +42,7 @@ public:
 	afx_msg void OnBnClickedRadiopen();
 	afx_msg void OnBnClickedRadioeraser();
 	afx_msg void OnPaint();
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 };
 
 extern DlgOptions theDlg;

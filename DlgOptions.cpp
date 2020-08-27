@@ -18,6 +18,7 @@ IMPLEMENT_DYNAMIC(DlgOptions, CDialogEx)
 DlgOptions::DlgOptions(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_OPTIONS, pParent)
 {
+	m_hAccel = NULL;
 }
 
 DlgOptions::~DlgOptions()
@@ -63,6 +64,8 @@ void DlgOptions::OnStnClickedPreview()
 BOOL DlgOptions::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
+
+	m_hAccel = ::LoadAccelerators(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_ACCELERATOR1));
 
 	CWnd* pBuiltin = GetDlgItem(IDC_BUILTIN);
 	pBuiltin->SendMessage(EM_SETLIMITTEXT, 1, 0);
@@ -263,3 +266,12 @@ void DlgOptions::OnPaint()
 	CDialogEx::OnPaint();
 }
 
+
+
+BOOL DlgOptions::PreTranslateMessage(MSG* pMsg)
+{
+	if (::TranslateAccelerator(GetSafeHwnd(), m_hAccel, pMsg))
+		return TRUE;
+
+	return CDialogEx::PreTranslateMessage(pMsg);
+}
