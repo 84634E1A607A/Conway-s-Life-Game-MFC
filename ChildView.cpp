@@ -38,6 +38,12 @@ BEGIN_MESSAGE_MAP(CChildView, CWnd)
 	ON_COMMAND(ID_FASTER, &CChildView::OnFaster)
 	ON_COMMAND(ID_SLOWER, &CChildView::OnSlower)
 	ON_COMMAND(ID_CONTROLWND, &CChildView::OnControlwnd)
+	ON_COMMAND(ID_MOVE_LEFT, &CChildView::OnMoveLeft)
+	ON_COMMAND(ID_MOVE_RIGHT, &CChildView::OnMoveRight)
+	ON_COMMAND(ID_MOVE_UP, &CChildView::OnMoveUp)
+	ON_COMMAND(ID_MOVE_DOWN, &CChildView::OnMoveDown)
+	ON_COMMAND(ID_START_STOP, &CChildView::OnStartStop)
+	ON_COMMAND(ID_SWITCH_WINDOW, &CChildView::OnSwitchWindow)
 END_MESSAGE_MAP()
 
 
@@ -203,39 +209,6 @@ void CChildView::OnMouseMove(UINT nFlags, CPoint point)    //bug:skip points whe
 void CChildView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
 	switch (nChar) {
-	case VK_LEFT: {
-		xpivot -= move_length / side_length;
-		RedrawWindow(nullptr, nullptr, RDW_INVALIDATE);
-		change_xpivot();
-		break;
-	}
-	case VK_RIGHT: {
-		xpivot += move_length / side_length;
-		RedrawWindow(nullptr, nullptr, RDW_INVALIDATE);
-		change_xpivot();
-		break;
-	}
-	case VK_UP: {
-		ypivot -= move_length / side_length;
-		RedrawWindow(nullptr, nullptr, RDW_INVALIDATE);
-		change_ypivot();
-		break;
-	}
-	case VK_DOWN: {
-		ypivot += move_length / side_length;
-		RedrawWindow(nullptr, nullptr, RDW_INVALIDATE);
-		change_ypivot();
-		break;
-	}
-	case VK_SPACE: {
-		started = !started;
-		if (!started) map.free_extra();
-		break;
-	}
-	case VK_TAB: {
-		if (theDlg.IsWindowVisible())theDlg.SetFocus();
-		break;
-	}
 	case 'B': {
 		kbd_input_state = 1;
 		break;
@@ -310,4 +283,53 @@ void CChildView::OnControlwnd()
 {
 	bool isvisible = theDlg.IsWindowVisible();
 	theDlg.ShowWindow(isvisible ? SW_HIDE : SW_SHOWNOACTIVATE);
+}
+
+
+void CChildView::OnMoveLeft()
+{
+	xpivot -= move_length / side_length;
+	RedrawWindow(nullptr, nullptr, RDW_INVALIDATE);
+	change_xpivot();
+}
+
+
+
+void CChildView::OnMoveRight()
+{
+	xpivot += move_length / side_length;
+	RedrawWindow(nullptr, nullptr, RDW_INVALIDATE);
+	change_xpivot();
+}
+
+
+
+void CChildView::OnMoveUp()
+{
+	ypivot -= move_length / side_length;
+	RedrawWindow(nullptr, nullptr, RDW_INVALIDATE);
+	change_ypivot();
+}
+
+
+void CChildView::OnMoveDown()
+{
+	ypivot += move_length / side_length;
+	RedrawWindow(nullptr, nullptr, RDW_INVALIDATE);
+	change_ypivot();
+}
+
+
+void CChildView::OnStartStop()
+{
+	started = !started;
+	if (!started) map.free_extra();
+}
+
+
+void CChildView::OnSwitchWindow()
+{
+	if (theDlg.IsWindowVisible()) {
+		theDlg.SetFocus();
+	}
 }

@@ -48,13 +48,12 @@ rightclick \t\t- deploy builtin\r\n\
 tab \t\t- set focus to the control window (if shown)\r\n\
 b, 0-5 \t\t- select builtin\r\n\
 d, 0-7 \t\t- select direction\r\n\
-shift+c \t\t- Show/hide Control Dialog\r\n\
-shift+f \t\t- faster\r\n\
-shift+s \t\t- slower\r\n\
+c \t\t- Show/hide Control Dialog\r\n\
+=(+) \t\t- faster\r\n\
+-(_) \t\t- slower\r\n\
 ctrl+o \t\t- open file\r\n\
 ctrl+s \t\t- save file\r\n\
 ctrl+h \t\t- help (this dialog)\r\n\
-ctrl+a \t\t- about\r\n\
 Options->C/D \t- Click two points to create/delete a rectangle region\r\n\
 Find more interesting seeds in ./seeds");
 
