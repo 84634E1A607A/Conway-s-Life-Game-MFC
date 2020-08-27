@@ -320,7 +320,6 @@ void Map::load(CString& fname)
 		if (tmp != 0xffffffff)
 		{
 			clear();
-			file.Close();
 			throw L"Bad file! Map reset";
 		}
 		while (true) {
@@ -330,7 +329,6 @@ void Map::load(CString& fname)
 			if (x == 0xffffffff && y == 0xfffffffd) break;
 			if (!n) {
 				clear();
-				file.Close();
 				throw L"Bad file! Map reset";
 			}
 			change(x, y);
@@ -370,7 +368,6 @@ void Map::dump(CString& fname)
 		}
 	}
 	file.Write(tmp, sizeof(tmp));
-	file.Close();
 }
 
 void Map::free_extra() {
