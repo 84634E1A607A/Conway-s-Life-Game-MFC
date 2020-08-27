@@ -125,7 +125,7 @@ void CChildView::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	// TODO: Add your message handler code here and/or call default
 	int xc = point.x / side_length, yc = point.y / side_length;
-	map.change(xc + xpivot, yc + ypivot, (!mi.isClick && !mi.isPen) ? 2 : 0);
+	map.change(xc + xpivot, yc + ypivot, (mi.state == 2) ? 2 : 0);
 	RECT crect = { xc * side_length + 1, yc * side_length + 1, (xc + 1) * side_length, (yc + 1) * side_length };
 	if (ad.adstate) {
 		switch (ad.count) {
@@ -179,17 +179,33 @@ void CChildView::OnRButtonDown(UINT nFlags, CPoint point)
 	CWnd::OnRButtonDown(nFlags, point);
 }
 
-void CChildView::OnMouseMove(UINT nFlags, CPoint point)    //bug:skip points when the cursor moves too fast
+void CChildView::OnMouseMove(UINT nFlags, CPoint point)
 {
-	if ((nFlags & MK_LBUTTON) && !mi.isClick) {
+	if ((nFlags & MK_LBUTTON) && mi.state) {
 		int xc = point.x / side_length, yc = point.y / side_length;
 		CPoint pcur = { (LONG)(xc + xpivot),(LONG)(yc + ypivot) };
-		if (pcur != mi.pprev) {
-			mi.pprev = pcur;
-			map.change(pcur.x, pcur.y, mi.isPen ? 1 : 2);
-			RECT crect = { xc * side_length + 1, yc * side_length + 1, (xc + 1) * side_length, (yc + 1) * side_length };
-			RedrawWindow(&crect, 0, RDW_INVALIDATE);
+
+		if (mi.pprev != CPoint(0, 0))
+		{
+			{
+				CPoint& s = (pcur.x <= mi.pprev.x) ? pcur : mi.pprev, & e = (s == pcur) ? mi.pprev : pcur;
+				double k = ((double)e.y - s.y) / ((double)e.x - s.x);
+				for (int i = s.x; i <= e.x; i++)
+					map.change(i, (unsigned int)(s.y + ((double)i - s.x) * k), (mi.state == 1) ? 1 : 2);
+			}
+			{
+				CPoint& s = (pcur.y <= mi.pprev.y) ? pcur : mi.pprev, & e = (s == pcur) ? mi.pprev : pcur;
+				double k = ((double)e.x - s.x) / ((double)e.y - s.y);
+				for (int i = s.y; i <= e.y; i++)
+					map.change((unsigned int)(s.x + ((double)i - s.y) * k), i, (mi.state == 1) ? 1 : 2);
+			}
 		}
+
+		RedrawWindow(nullptr, nullptr, RDW_INVALIDATE);
+		mi.pprev = pcur;
+	}
+	else {
+		mi.pprev = { 0, 0 };
 	}
 	CWnd::OnMouseMove(nFlags, point);
 }

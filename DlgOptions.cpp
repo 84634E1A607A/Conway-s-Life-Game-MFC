@@ -239,21 +239,19 @@ void DlgOptions::OnChangeYpivot()
 
 void DlgOptions::OnBnClickedRadioclick()
 {
-	mi.isClick = true;
+	mi.state = 0;
 }
 
 
 void DlgOptions::OnBnClickedRadiopen()
 {
-	mi.isClick = false;
-	mi.isPen = true;
+	mi.state = 1;
 }
 
 
 void DlgOptions::OnBnClickedRadioeraser()
 {
-	mi.isClick = false;
-	mi.isPen = false;
+	mi.state = 2;
 }
 
 

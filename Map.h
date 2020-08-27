@@ -95,8 +95,7 @@ struct AD {
 };
 
 struct MOUSEINFO {
-	bool isClick = true; //default
-	bool isPen = true; //pen or eraser
+	BYTE state; // { 0: Click, 1: Pen, 2: Eraser }
 	CPoint pprev = { 0, 0 };
 };
 
