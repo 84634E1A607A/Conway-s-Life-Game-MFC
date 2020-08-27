@@ -301,43 +301,10 @@ LPCTSTR Map::get_size() {
 	return size;
 }
 
-/*void Map::load(const char* fname) {
-	try {
-		FILE* fin;
-		fopen_s(&fin, fname, "rb");
-		if (!fin) throw L"Cannot open file";
-		clear();
-		fread_s(&xpivot, sizeof(xpivot), sizeof(xpivot), 1, fin);
-		fread_s(&ypivot, sizeof(ypivot), sizeof(ypivot), 1, fin);
-		unsigned int tmp;
-		fread_s(&tmp, sizeof(tmp), sizeof(tmp), 1, fin);
-		if (tmp != 0xffffffff) {
-			clear();
-			fclose(fin);
-			throw L"Bad file! Map reset";
-		}
-		while (true) {
-			unsigned int x, y;
-			fread_s(&x, sizeof(x), sizeof(x), 1, fin);
-			fread_s(&y, sizeof(y), sizeof(y), 1, fin);
-			if (x == 0xffffffff && y == 0xfffffffd) break;
-			if (ferror(fin) || feof(fin)) {
-				clear();
-				fclose(fin);
-				throw L"Bad file! Map reset";
-			}
-			change(x, y);
-		}
-		fclose(fin);
-		redraw();
-	}
-	catch (const LPCTSTR msg) {
-		theApp.m_pMainWnd->MessageBox(msg, L"Error", MB_OK);
-	}
-}*/
 
 void Map::load(CString& fname)
 {
+	started = false;
 	try
 	{
 		CFile file;
@@ -353,6 +320,7 @@ void Map::load(CString& fname)
 		if (tmp != 0xffffffff)
 		{
 			clear();
+			file.Close();
 			throw L"Bad file! Map reset";
 		}
 		while (true) {
@@ -360,8 +328,9 @@ void Map::load(CString& fname)
 			m = file.Read(&x, sizeof(x));
 			n = file.Read(&y, sizeof(y));
 			if (x == 0xffffffff && y == 0xfffffffd) break;
-			if (!m || !n) {
+			if (!n) {
 				clear();
+				file.Close();
 				throw L"Bad file! Map reset";
 			}
 			change(x, y);
@@ -372,36 +341,8 @@ void Map::load(CString& fname)
 	{
 		theApp.m_pMainWnd->MessageBox(msg, L"Error", MB_OK);
 	}
-
 }
 
-/*void Map::dump(const char* fname) {
-	started = false;
-	FILE* fout;
-	fopen_s(&fout, fname, "wb");
-	if (!fout) {
-		theApp.m_pMainWnd->MessageBox(L"Cannot Open File", L"Error", MB_OK);
-		return;
-	}
-	unsigned int tmp[2] = { 0xffffffff, 0xfffffffd };
-	fwrite(&xpivot, sizeof(xpivot), 1, fout);
-	fwrite(&ypivot, sizeof(ypivot), 1, fout);
-	fwrite(tmp, sizeof(tmp[0]), 1, fout);
-	Map::head* ph = &cur;
-	while (ph->pnext) {
-		ph = ph->pnext;
-		unsigned int x = ph->x;
-		Map::node* pn = ph->pnode;
-		while (pn->pnext) {
-			pn = pn->pnext;
-			if (!pn->state) continue;
-			fwrite(&x, sizeof(x), 1, fout);
-			fwrite(&(pn->y), sizeof(pn->y), 1, fout);
-		}
-	}
-	fwrite(tmp, sizeof(tmp), 1, fout);
-	fclose(fout);
-}*/
 
 void Map::dump(CString& fname)
 {
@@ -429,6 +370,7 @@ void Map::dump(CString& fname)
 		}
 	}
 	file.Write(tmp, sizeof(tmp));
+	file.Close();
 }
 
 void Map::free_extra() {
@@ -446,7 +388,9 @@ void Map::free_extra() {
 			point_link_end->point = { (long)x, (long)pn->y }, point_link_end->pnext = nullptr;
 		}
 	}
+	unsigned int x = xpivot, y = ypivot;
 	clear();
+	xpivot = x, ypivot = y;
 	while (point_link_node->pnext) {
 		point_link_node = point_link_node->pnext;
 		change(point_link_node->point.x, point_link_node->point.y);
@@ -459,31 +403,6 @@ void Map::free_extra() {
 	}
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////
-//This is totally useless and destructive because the "cur" map need those nodes. They contain vital infomation. Clearing them can and is likely to lead to corruption.
-//The right way to clear memory is to store those info somewhere else, clear the memory, then restore those info.
-//One possible way is to create another table using struct POINT({x, y}) and traversal through the cur map (refer to Map::dump and Map::load).
-//void Map::trial_auto_release() 
-//{
-//	ppool* phead = phead_pools.pnext, * pdel = phead;
-//	while (phead != nullptr) {
-//		delete[] phead->phead;
-//		phead = phead->pnext;
-//		delete pdel;
-//		pdel = phead;
-//	}
-//	phead_pools.pnext = nullptr;
-//
-//	ppool* pnode = pnode_pools.pnext; pdel = pnode;
-//	while (pnode != nullptr) {
-//		delete[] pnode->pnode;
-//		pnode = pnode->pnext;
-//		delete pdel;
-//		pdel = pnode;
-//	}
-//	pnode_pools.pnext = nullptr;
-//}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Map::head* Map::enlarge_head_pool() {
 	Map::head* nhead_pool = new Map::head[SIZE];

@@ -49,6 +49,7 @@ BEGIN_MESSAGE_MAP(DlgOptions, CDialogEx)
 	ON_BN_CLICKED(IDC_RADIOPEN, &DlgOptions::OnBnClickedRadiopen)
 	ON_BN_CLICKED(IDC_RADIOERASER, &DlgOptions::OnBnClickedRadioeraser)
 	ON_WM_PAINT()
+	ON_BN_CLICKED(IDC_RADIODRAG, &DlgOptions::OnBnClickedRadiodrag)
 END_MESSAGE_MAP()
 
 
@@ -242,21 +243,25 @@ void DlgOptions::OnChangeYpivot()
 
 void DlgOptions::OnBnClickedRadioclick()
 {
-	mi.isClick = true;
+	mi.state = 0;
 }
 
 
 void DlgOptions::OnBnClickedRadiopen()
 {
-	mi.isClick = false;
-	mi.isPen = true;
+	mi.state = 1;
 }
 
 
 void DlgOptions::OnBnClickedRadioeraser()
 {
-	mi.isClick = false;
-	mi.isPen = false;
+	mi.state = 2;
+}
+
+
+void DlgOptions::OnBnClickedRadiodrag()
+{
+	mi.state = 3;
 }
 
 
@@ -275,3 +280,4 @@ BOOL DlgOptions::PreTranslateMessage(MSG* pMsg)
 
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
+

@@ -43,6 +43,7 @@ public:
 	afx_msg void OnBnClickedRadioeraser();
 	afx_msg void OnPaint();
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	afx_msg void OnBnClickedRadiodrag();
 };
 
 extern DlgOptions theDlg;

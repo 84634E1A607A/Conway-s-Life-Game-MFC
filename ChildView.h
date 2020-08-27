@@ -43,5 +43,13 @@ public:
 	afx_msg void OnFaster();
 	afx_msg void OnSlower();
 	afx_msg void OnControlwnd();
+	afx_msg void OnMoveLeft();
+	afx_msg void OnMoveRight();
+	afx_msg void OnMoveUp();
+	afx_msg void OnMoveDown();
+	afx_msg void OnStartStop();
+	afx_msg void OnSwitchWindow();
+//	afx_msg void OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags);
+	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
 };
 
