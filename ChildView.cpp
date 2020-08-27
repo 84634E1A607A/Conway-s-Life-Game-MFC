@@ -28,9 +28,7 @@ CChildView::~CChildView()
 
 BEGIN_MESSAGE_MAP(CChildView, CWnd)
 	ON_WM_PAINT()
-//	ON_WM_ERASEBKGND()
 	ON_WM_LBUTTONDOWN()
-//	ON_WM_TIMER()
 	ON_WM_KEYDOWN()
 	ON_WM_RBUTTONDOWN()
 	ON_WM_MOUSEMOVE()
@@ -44,6 +42,7 @@ BEGIN_MESSAGE_MAP(CChildView, CWnd)
 	ON_COMMAND(ID_MOVE_DOWN, &CChildView::OnMoveDown)
 	ON_COMMAND(ID_START_STOP, &CChildView::OnStartStop)
 	ON_COMMAND(ID_SWITCH_WINDOW, &CChildView::OnSwitchWindow)
+	ON_WM_LBUTTONUP()
 END_MESSAGE_MAP()
 
 
@@ -113,17 +112,10 @@ void CChildView::OnPaint()
 		theDlg.SetDlgItemText(IDC_PAINT_TIME, s);
 }
 
-//BOOL CChildView::OnEraseBkgnd(CDC* pDC)
-//{
-//	// TODO: Add your message handler code here and/or call default
-//	needErase = true;
-//	return CWnd::OnEraseBkgnd(pDC);
-//}
-
 
 void CChildView::OnLButtonDown(UINT nFlags, CPoint point)
 {
-	// TODO: Add your message handler code here and/or call default
+	if (mi.state == 3) return CWnd::OnLButtonDown(nFlags, point);;
 	int xc = point.x / side_length, yc = point.y / side_length;
 	map.change(xc + xpivot, yc + ypivot, (mi.state == 2) ? 2 : 0);
 	RECT crect = { xc * side_length + 1, yc * side_length + 1, (xc + 1) * side_length, (yc + 1) * side_length };
@@ -184,42 +176,33 @@ void CChildView::OnMouseMove(UINT nFlags, CPoint point)
 	if ((nFlags & MK_LBUTTON) && mi.state) {
 		int xc = point.x / side_length, yc = point.y / side_length;
 		CPoint pcur = { (LONG)(xc + xpivot),(LONG)(yc + ypivot) };
-
 		if (mi.pprev != CPoint(0, 0))
 		{
-			{
-				CPoint& s = (pcur.x <= mi.pprev.x) ? pcur : mi.pprev, & e = (s == pcur) ? mi.pprev : pcur;
-				double k = ((double)e.y - s.y) / ((double)e.x - s.x);
-				for (int i = s.x; i <= e.x; i++)
-					map.change(i, (unsigned int)(s.y + ((double)i - s.x) * k), (mi.state == 1) ? 1 : 2);
+			if (mi.state == 3) {
+				xpivot = mi.pprev.x - xc;
+				ypivot = mi.pprev.y - yc;
 			}
-			{
-				CPoint& s = (pcur.y <= mi.pprev.y) ? pcur : mi.pprev, & e = (s == pcur) ? mi.pprev : pcur;
-				double k = ((double)e.x - s.x) / ((double)e.y - s.y);
-				for (int i = s.y; i <= e.y; i++)
-					map.change((unsigned int)(s.x + ((double)i - s.y) * k), i, (mi.state == 1) ? 1 : 2);
+			else {
+				{
+					CPoint& s = (pcur.x <= mi.pprev.x) ? pcur : mi.pprev, & e = (s == pcur) ? mi.pprev : pcur;
+					double k = ((double)e.y - s.y) / ((double)e.x - s.x);
+					for (int i = s.x; i <= e.x; i++)
+						map.change(i, (unsigned int)(s.y + ((double)i - s.x) * k), (mi.state == 1) ? 1 : 2);
+				}
+				{
+					CPoint& s = (pcur.y <= mi.pprev.y) ? pcur : mi.pprev, & e = (s == pcur) ? mi.pprev : pcur;
+					double k = ((double)e.x - s.x) / ((double)e.y - s.y);
+					for (int i = s.y; i <= e.y; i++)
+						map.change((unsigned int)(s.x + ((double)i - s.y) * k), i, (mi.state == 1) ? 1 : 2);
+				}
+				mi.pprev = pcur;
 			}
 		}
-
+		else mi.pprev = pcur;
 		RedrawWindow(nullptr, nullptr, RDW_INVALIDATE);
-		mi.pprev = pcur;
-	}
-	else {
-		mi.pprev = { 0, 0 };
 	}
 	CWnd::OnMouseMove(nFlags, point);
 }
-
-
-//void CChildView::OnTimer(UINT_PTR nIDEvent)
-//{
-//	if (started) {
-//		map.calc();
-//		RECT rect;
-//		GetClientRect(&rect);
-//		RedrawWindow(&rect, 0, RDW_INVALIDATE);
-//	}
-//}
 
 
 void CChildView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
@@ -348,4 +331,10 @@ void CChildView::OnSwitchWindow()
 	if (theDlg.IsWindowVisible()) {
 		theDlg.SetFocus();
 	}
+}
+
+void CChildView::OnLButtonUp(UINT nFlags, CPoint point)
+{
+	mi.pprev = { 0, 0 };
+	CWnd::OnLButtonUp(nFlags, point);
 }

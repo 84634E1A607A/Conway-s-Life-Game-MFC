@@ -49,5 +49,7 @@ public:
 	afx_msg void OnMoveDown();
 	afx_msg void OnStartStop();
 	afx_msg void OnSwitchWindow();
+//	afx_msg void OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags);
+	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
 };
 

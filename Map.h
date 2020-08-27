@@ -95,7 +95,7 @@ struct AD {
 };
 
 struct MOUSEINFO {
-	BYTE state; // { 0: Click, 1: Pen, 2: Eraser }
+	BYTE state; // { 0: Click, 1: Pen, 2: Eraser, 3: Drag }
 	CPoint pprev = { 0, 0 };
 };
 

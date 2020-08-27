@@ -48,6 +48,7 @@ BEGIN_MESSAGE_MAP(DlgOptions, CDialogEx)
 	ON_BN_CLICKED(IDC_RADIOPEN, &DlgOptions::OnBnClickedRadiopen)
 	ON_BN_CLICKED(IDC_RADIOERASER, &DlgOptions::OnBnClickedRadioeraser)
 	ON_WM_PAINT()
+	ON_BN_CLICKED(IDC_RADIODRAG, &DlgOptions::OnBnClickedRadiodrag)
 END_MESSAGE_MAP()
 
 
@@ -255,9 +256,14 @@ void DlgOptions::OnBnClickedRadioeraser()
 }
 
 
+void DlgOptions::OnBnClickedRadiodrag()
+{
+	mi.state = 3;
+}
+
+
 void DlgOptions::OnPaint()
 {
 	map.draw_builtin(this);
 	CDialogEx::OnPaint();
 }
-
