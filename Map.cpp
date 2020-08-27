@@ -304,6 +304,7 @@ LPCTSTR Map::get_size() {
 
 void Map::load(CString& fname)
 {
+	started = false;
 	try
 	{
 		CFile file;
@@ -387,7 +388,9 @@ void Map::free_extra() {
 			point_link_end->point = { (long)x, (long)pn->y }, point_link_end->pnext = nullptr;
 		}
 	}
+	unsigned int x = xpivot, y = ypivot;
 	clear();
+	xpivot = x, ypivot = y;
 	while (point_link_node->pnext) {
 		point_link_node = point_link_node->pnext;
 		change(point_link_node->point.x, point_link_node->point.y);
