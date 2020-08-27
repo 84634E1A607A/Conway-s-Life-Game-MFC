@@ -23,6 +23,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_CREATE_DELETE, &CMainFrame::OnCreateDelete)
 	ON_COMMAND(ID_CREATE_RANDOM, &CMainFrame::OnCreateRandom)
 	ON_COMMAND(ID_CREATE_RECTANGLE, &CMainFrame::OnCreateRectangle)
+	ON_WM_DROPFILES()
 END_MESSAGE_MAP()
 
 // CMainFrame construction/destruction
@@ -140,4 +141,14 @@ void CMainFrame::OnCreateRectangle()
 	started = false;
 	ad.isrand = false;
 	// TODO: Add your command handler code here
+}
+
+void CMainFrame::OnDropFiles(HDROP hDropInfo)
+{
+	TCHAR fname[MAX_PATH];
+	DragQueryFile(hDropInfo, 0, fname, MAX_PATH);
+	map.load(CString(fname));
+	DragFinish(hDropInfo);
+
+	CFrameWnd::OnDropFiles(hDropInfo);
 }
