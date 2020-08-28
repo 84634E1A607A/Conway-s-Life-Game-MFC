@@ -330,10 +330,10 @@ void CChildView::OnSwitchWindow()
 {
 	if (theDlg.IsWindowVisible()) 
 	{
-		if (theDlg.GetSafeHwnd() != ::GetFocus())
-			theDlg.SetFocus();
-		else
+		HWND focusedHwnd = GetActiveWindow()->GetSafeHwnd(), mwnd = ::AfxGetMainWnd()->GetSafeHwnd();
+		if (mwnd != focusedHwnd)
 			theApp.m_pMainWnd->SetFocus();
+		else theDlg.SetFocus();
 	}
 }
 

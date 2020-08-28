@@ -66,7 +66,7 @@ BOOL DlgOptions::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	m_hAccel = ::LoadAccelerators(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_ACCELERATOR1));
+	m_hAccel = ::LoadAccelerators(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_ACCELERATOR_DLG));
 
 	CWnd* pBuiltin = GetDlgItem(IDC_BUILTIN);
 	pBuiltin->SendMessage(EM_SETLIMITTEXT, 1, 0);
