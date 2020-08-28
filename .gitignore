@@ -1,4 +1,12 @@
-Release
+Release/*.obj
+Release/*.iobj
+Release/*.pdb
+Release/*.ipdb
+Release/*.log
+Release/*.tlog
+Release/*.txt
+Release/*.res
+Release/*.pch
 Debug
 x64
 .vs
