@@ -104,12 +104,6 @@ int CLifeMFCApp::ExitInstance()
 	return CWinApp::ExitInstance();
 }
 
-// CLifeMFCApp message handlers
-
-
-
-
-
 CAboutDlg::CAboutDlg() noexcept : CDialogEx(IDD_ABOUTBOX)
 {
 }
@@ -142,9 +136,6 @@ void CLifeMFCApp::OnOptionsOpen()
 	CString fname = fOpenDlg.GetPathName();
 	if (!fname.GetLength()) return;
 	map.load(fname);
-	/*char fnameA[256] = "";
-	wsprintfA(fnameA, "%ws", fname.GetString());
-	map.load(fnameA);*/
 }
 
 
@@ -155,9 +146,6 @@ void CLifeMFCApp::OnOptionsSave()
 	CString fname = fSaveDlg.GetPathName();
 	if (!fname.GetLength()) return;
 	map.dump(fname);
-	/*char fnameA[256] = "";
-	wsprintfA(fnameA, "%ws", fname.GetString());
-	map.dump(fnameA);*/
 }
 
 void CLifeMFCApp::OnHelpHelp()
