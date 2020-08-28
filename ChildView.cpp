@@ -328,8 +328,12 @@ void CChildView::OnStartStop()
 
 void CChildView::OnSwitchWindow()
 {
-	if (theDlg.IsWindowVisible()) {
-		theDlg.SetFocus();
+	if (theDlg.IsWindowVisible()) 
+	{
+		if (theDlg.GetSafeHwnd() != ::GetFocus())
+			theDlg.SetFocus();
+		else
+			theApp.m_pMainWnd->SetFocus();
 	}
 }
 

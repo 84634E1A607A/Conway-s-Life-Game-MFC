@@ -88,7 +88,7 @@ BOOL CLifeMFCApp::InitInstance()
 
 	theDlg.Create(IDD_OPTIONS);
 	pFrame->SetFocus();
-	//theDlg.ShowWindow(SW_SHOW);
+	
 
 	if (m_lpCmdLine[0] != '\0')
 	{

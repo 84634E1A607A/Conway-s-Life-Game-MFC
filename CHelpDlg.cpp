@@ -45,7 +45,7 @@ BOOL CHelpDlg::OnInitDialog()
 		L"space \t\t- start/stop\r\n\
 leftclick \t\t- select/unselect (Click) / draw (Pen) / erase (Eraser)\r\n\
 rightclick \t\t- deploy builtin\r\n\
-tab \t\t- set focus to the control window (if shown)\r\n\
+shift+s \t\t- switch focus (if control window is shown)\r\n\
 b, 0-5 \t\t- select builtin\r\n\
 d, 0-7 \t\t- select direction\r\n\
 c \t\t- Show/hide Control Dialog\r\n\
