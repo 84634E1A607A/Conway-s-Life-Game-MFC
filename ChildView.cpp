@@ -242,6 +242,7 @@ BOOL CChildView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 	else {
 		i += zDelta / 40;
 		if (i < 3) i = 3;
+		if (i > 999) i = 999;
 		_itow_s(i, str, 10);
 		pScale->SetWindowText(str);
 	}
