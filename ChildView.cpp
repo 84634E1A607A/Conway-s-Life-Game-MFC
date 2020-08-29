@@ -117,7 +117,7 @@ void CChildView::OnLButtonDown(UINT nFlags, CPoint point)
 	RECT CliRect;
 	GetClientRect(&CliRect);
 	int mid_x = CliRect.right / 2, mid_y = CliRect.bottom / 2;
-	int xc = (int)(((__int64)point.x - (__int64)mid_x + (__int64)xpivot * (__int64)side_length) / (__int64)side_length), yc = (int)(((__int64)point.y - (__int64)mid_y + (__int64)ypivot * (__int64)side_length) / (__int64)side_length);
+	int xc = (int)((point.x - mid_x + 0x1000 * side_length) / side_length - 0x1000 + xpivot), yc = (int)((point.y - mid_y + 0x1000 * side_length) / side_length - 0x1000 + ypivot);
 	map.change(xc, yc, (mi.state == 2) ? 2 : 0);
 	if (ad.adstate) {
 		if (!ad.count) {
@@ -150,7 +150,7 @@ void CChildView::OnRButtonDown(UINT nFlags, CPoint point)
 	RECT CliRect;
 	GetClientRect(&CliRect);
 	int mid_x = CliRect.right / 2, mid_y = CliRect.bottom / 2;
-	int xc = (point.x - mid_x + side_length * xpivot) / side_length, yc = (point.y - mid_y + side_length * ypivot) / side_length;
+	int xc = (int)((point.x - mid_x + 0x1000 * side_length) / side_length - 0x1000 + xpivot), yc = (int)((point.y - mid_y + 0x1000 * side_length) / side_length - 0x1000 + ypivot);
 	map.add_builtin(xc, yc);
 	RedrawWindow(nullptr, nullptr, RDW_INVALIDATE);
 	CWnd::OnRButtonDown(nFlags, point);
@@ -162,7 +162,7 @@ void CChildView::OnMouseMove(UINT nFlags, CPoint point)
 		RECT CliRect;
 		GetClientRect(&CliRect);
 		int mid_x = CliRect.right / 2, mid_y = CliRect.bottom / 2;
-		int xc = (point.x - mid_x + side_length * xpivot) / side_length, yc = (point.y - mid_y + side_length * ypivot) / side_length;
+		int xc = (int)((point.x - mid_x + 0x1000 * side_length) / side_length - 0x1000 + xpivot), yc = (int)((point.y - mid_y + 0x1000 * side_length) / side_length - 0x1000 + ypivot);
 		CPoint pcur = { xc, yc };
 		if (mi.pprev != CPoint(0, 0))
 		{
