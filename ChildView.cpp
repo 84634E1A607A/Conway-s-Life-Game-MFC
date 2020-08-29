@@ -117,7 +117,7 @@ void CChildView::OnLButtonDown(UINT nFlags, CPoint point)
 	RECT CliRect;
 	GetClientRect(&CliRect);
 	int mid_x = CliRect.right / 2, mid_y = CliRect.bottom / 2;
-	int xc = (point.x - mid_x + side_length * xpivot) / side_length, yc = (point.y - mid_y + side_length * ypivot) / side_length;
+	int xc = (int)(((__int64)point.x - (__int64)mid_x + (__int64)xpivot * (__int64)side_length) / (__int64)side_length), yc = (int)(((__int64)point.y - (__int64)mid_y + (__int64)ypivot * (__int64)side_length) / (__int64)side_length);
 	map.change(xc, yc, (mi.state == 2) ? 2 : 0);
 	if (ad.adstate) {
 		if (!ad.count) {
