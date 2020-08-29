@@ -1,12 +1,4 @@
-Release/*.obj
-Release/*.iobj
-Release/*.pdb
-Release/*.ipdb
-Release/*.log
-Release/*.tlog
-Release/*.txt
-Release/*.res
-Release/*.pch
+Release
 Debug
 x64
 .vs

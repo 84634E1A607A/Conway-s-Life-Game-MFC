@@ -10,7 +10,7 @@
 #endif
 
 int side_length = 10;
-unsigned int xpivot = 0x08000000, ypivot = 0x08000000;
+int xpivot = 0x08000000, ypivot = 0x08000000;
 bool started;
 unsigned int selected_builtin, selected_direction, kbd_input_state, TIMER = 500;
 const unsigned int move_length = 30;
@@ -58,7 +58,7 @@ Map::Map() {
 }
 
 //type: {0: 1->0, 0->1; 1: 0,1->1; 2: 0,1->0}
-Map::head* Map::change(unsigned int xpos, unsigned int ypos, int type, head* pacceh) {
+Map::head* Map::change(int xpos, int ypos, int type, head* pacceh) {
 	Map::head* px = &cur;
 	if (pacceh && pacceh->x <= xpos) px = pacceh;
 	while (px->pnext && px->pnext->x <= xpos) px = px->pnext;
@@ -167,7 +167,7 @@ void Map::clear() {
 	change_xpivot(), change_ypivot();
 }
 
-void Map::add_builtin(const unsigned int& xpos, const unsigned int& ypos, const unsigned int& b, const unsigned int& d) {
+void Map::add_builtin(const int& xpos, const int& ypos, const unsigned int& b, const unsigned int& d) {
 	if (b >= 10 || d >= 8) return;
 	unsigned int s = builtins[b].size, l = builtins[b].length - 1, h = builtins[b].height - 1;
 	const POINT* cur = builtins[b].points;
@@ -221,8 +221,9 @@ void Map::add_delete_region(RECT& rect, bool isadd, bool isrand) {
 }
 
 void Map::draw(CDC& cdc, RECT& rect) {
-	unsigned int left = rect.left / side_length + xpivot, right = rect.right / side_length + xpivot;
-	unsigned int top = rect.top / side_length + ypivot, bottom = rect.bottom / side_length + ypivot;
+	int mid_x = rect.right / 2, mid_y = rect.bottom / 2;
+	int left = (-mid_x) / side_length + xpivot - 1, right = (rect.right - mid_x) / side_length + xpivot + 1;
+	int top = (-mid_y) / side_length + ypivot - 1, bottom = (rect.bottom - mid_y) / side_length + ypivot + 1;
 	Map::head* pl = &cur;
 	while (pl->pnext && pl->pnext->x < left) pl = pl->pnext;
 	Map::head* px = pl;
@@ -231,10 +232,10 @@ void Map::draw(CDC& cdc, RECT& rect) {
 		while (py->pnext && py->pnext->y < top) py = py->pnext;
 		while (py->pnext && py->pnext->y <= bottom) {
 			RECT fill_rect = {
-				(LONG)((px->pnext->x - xpivot) * side_length + 1), //left
-				(LONG)((py->pnext->y - ypivot) * side_length + 1), //top
-				(LONG)((px->pnext->x - xpivot + 1) * side_length), //right
-				(LONG)((py->pnext->y - ypivot + 1) * side_length)  //bottom
+				(LONG)((px->pnext->x - xpivot) * side_length + mid_x + 1), //left
+				(LONG)((py->pnext->y - ypivot) * side_length + mid_y + 1), //top
+				(LONG)((px->pnext->x - xpivot + 1) * side_length + mid_x), //right
+				(LONG)((py->pnext->y - ypivot + 1) * side_length + mid_y)  //bottom
 			};
 			cdc.FillSolidRect(&fill_rect, RGB(0, 0, 0));
 			py = py->pnext;
@@ -565,7 +566,7 @@ void Map::del(Map::head* h) {
 #endif
 }
 
-Map::head* Map::add(unsigned int xpos, unsigned int ypos, head* pacceh) {
+Map::head* Map::add(int xpos, int ypos, head* pacceh) {
 #ifdef REALTIME_NEW
 #endif
 	Map::head* px = &nxt;
@@ -592,7 +593,7 @@ Map::head* Map::add(unsigned int xpos, unsigned int ypos, head* pacceh) {
 	return px;
 }
 
-void Map::mark(unsigned int xpos, unsigned int ypos) {
+void Map::mark(int xpos, int ypos) {
 	Map::head* px = &nxt;
 	while (px->pnext && px->pnext->x <= xpos) px = px->pnext;
 	Map::node* py = px->pnode;

@@ -80,7 +80,6 @@ void CChildView::OnPaint()
 	GetClientRect(&CliRect);
 	bmp.CreateCompatibleBitmap(&dc, CliRect.right, CliRect.bottom);
 	mdc.SelectObject(bmp);
-	//mdc.BitBlt(0, 0, CliRect.right, CliRect.bottom, &dc, 0, 0, SRCCOPY);
 
 	mdc.SelectObject(hBlackBrush);
 	mdc.SelectObject(hLinePen);
@@ -88,15 +87,13 @@ void CChildView::OnPaint()
 	/*  init   */
 	mdc.FillSolidRect(&CliRect, RGB(255,255,255));
 
+	int mid_x = CliRect.right / 2, mid_y = CliRect.bottom / 2;
+
 	/*  lines  */
-	for (int i = 0; i <= CliRect.right / side_length; i++) {
-		mdc.MoveTo(i * side_length, 0);
-		mdc.LineTo(i * side_length, CliRect.bottom);
-	}
-	for (int i = 0; i <= CliRect.bottom / side_length; i++) {
-		mdc.MoveTo(0, i * side_length);
-		mdc.LineTo(CliRect.right, i * side_length);
-	}
+	for (int i = mid_x % side_length; i <= CliRect.right; i += side_length)
+		mdc.MoveTo(i, 0), mdc.LineTo(i, CliRect.bottom);
+	for (int i = mid_y % side_length; i <= CliRect.bottom; i += side_length)
+		mdc.MoveTo(0, i), mdc.LineTo(CliRect.right, i);
 
 	/*  blocks  */
 	map.draw(mdc, CliRect);
@@ -115,58 +112,46 @@ void CChildView::OnPaint()
 
 void CChildView::OnLButtonDown(UINT nFlags, CPoint point)
 {
-	if (mi.state == 3) return CWnd::OnLButtonDown(nFlags, point);;
-	int xc = point.x / side_length, yc = point.y / side_length;
-	map.change(xc + xpivot, yc + ypivot, (mi.state == 2) ? 2 : 0);
-	RECT crect = { xc * side_length + 1, yc * side_length + 1, (xc + 1) * side_length, (yc + 1) * side_length };
+	if (mi.state == 3 && !ad.adstate) return CWnd::OnLButtonDown(nFlags, point);
+
+	RECT CliRect;
+	GetClientRect(&CliRect);
+	int mid_x = CliRect.right / 2, mid_y = CliRect.bottom / 2;
+	int xc = (point.x - mid_x + side_length * xpivot) / side_length, yc = (point.y - mid_y + side_length * ypivot) / side_length;
+	map.change(xc, yc, (mi.state == 2) ? 2 : 0);
 	if (ad.adstate) {
-		switch (ad.count) {
-		case 0: {
+		if (!ad.count) {
 			ad.p1.x = xc;
 			ad.p1.y = yc;
 			ad.count++;
-			break;
 		}
-		case 1: {
-			ad.p2.x = xc;
-			ad.p2.y = yc;
+		else{
 			CPoint p1, p2;
-			p1.x = min(ad.p1.x, ad.p2.x);
-			p1.y = min(ad.p1.y, ad.p2.y);
-			p2.x = max(ad.p1.x, ad.p2.x);
-			p2.y = max(ad.p1.y, ad.p2.y);
-			RECT adrect = { (LONG)(p1.x + xpivot), (LONG)(p1.y + ypivot), (LONG)(p2.x + xpivot), (LONG)(p2.y + ypivot) };
+			p1.x = min(ad.p1.x, xc);
+			p1.y = min(ad.p1.y, yc);
+			p2.x = max(ad.p1.x, xc);
+			p2.y = max(ad.p1.y, yc);
+			RECT adrect = { p1.x, p1.y, p2.x, p2.y };
 			map.add_delete_region(adrect, ad.act, ad.isrand);
-			crect = { p1.x * side_length + 1, p1.y * side_length + 1, (p2.x + 1) * side_length, (p2.y + 1) * side_length };
 			ad.count = 0;
 			ad.adstate = false;
-			break;
-		}
-		default: {
-			break;
-		}
 		}
 	}
 	else{
-		mi.pprev = { (LONG)(xc + xpivot), (LONG)(yc + ypivot) };
+		mi.pprev = { xc, yc };
 	}
-	RedrawWindow(&crect, 0, RDW_INVALIDATE);
+	RedrawWindow(nullptr, nullptr, RDW_INVALIDATE);
 	CWnd::OnLButtonDown(nFlags, point);
 }
 
 
 void CChildView::OnRButtonDown(UINT nFlags, CPoint point)
 {
-	// TODO: Add your message handler code here and/or call default
-	int xc = point.x / side_length, yc = point.y / side_length;
-	map.add_builtin(xc + xpivot, yc + ypivot);
-	//RECT crect;
-	//if (selected_direction < 0);
-	//else if (selected_direction < 4)
-	//	crect = { xc * side_length + 1, yc * side_length + 1, (xc + map.get_builtin_info().right) * side_length, (yc + map.get_builtin_info().bottom) * side_length };
-	//else if (selected_direction < 8)
-	//	crect = { xc * side_length + 1, yc * side_length + 1, (xc + map.get_builtin_info().bottom) * side_length, (yc + map.get_builtin_info().right) * side_length };
-	//RedrawWindow(&crect, 0, RDW_INVALIDATE);
+	RECT CliRect;
+	GetClientRect(&CliRect);
+	int mid_x = CliRect.right / 2, mid_y = CliRect.bottom / 2;
+	int xc = (point.x - mid_x + side_length * xpivot) / side_length, yc = (point.y - mid_y + side_length * ypivot) / side_length;
+	map.add_builtin(xc, yc);
 	RedrawWindow(nullptr, nullptr, RDW_INVALIDATE);
 	CWnd::OnRButtonDown(nFlags, point);
 }
@@ -174,26 +159,30 @@ void CChildView::OnRButtonDown(UINT nFlags, CPoint point)
 void CChildView::OnMouseMove(UINT nFlags, CPoint point)
 {
 	if ((nFlags & MK_LBUTTON) && mi.state) {
-		int xc = point.x / side_length, yc = point.y / side_length;
-		CPoint pcur = { (LONG)(xc + xpivot),(LONG)(yc + ypivot) };
+		RECT CliRect;
+		GetClientRect(&CliRect);
+		int mid_x = CliRect.right / 2, mid_y = CliRect.bottom / 2;
+		int xc = (point.x - mid_x + side_length * xpivot) / side_length, yc = (point.y - mid_y + side_length * ypivot) / side_length;
+		CPoint pcur = { xc, yc };
 		if (mi.pprev != CPoint(0, 0))
 		{
 			if (mi.state == 3) {
-				xpivot = mi.pprev.x - xc;
-				ypivot = mi.pprev.y - yc;
+				xpivot = mi.pprev.x - xc + xpivot;
+				ypivot = mi.pprev.y - yc + ypivot;
+				change_xpivot(), change_ypivot();
 			}
 			else {
 				{
 					CPoint& s = (pcur.x <= mi.pprev.x) ? pcur : mi.pprev, & e = (s == pcur) ? mi.pprev : pcur;
 					double k = ((double)e.y - s.y) / ((double)e.x - s.x);
 					for (int i = s.x; i <= e.x; i++)
-						map.change(i, (unsigned int)(s.y + ((double)i - s.x) * k), (mi.state == 1) ? 1 : 2);
+						map.change(i, (int)(s.y + ((double)i - s.x) * k), (mi.state == 1) ? 1 : 2);
 				}
 				{
 					CPoint& s = (pcur.y <= mi.pprev.y) ? pcur : mi.pprev, & e = (s == pcur) ? mi.pprev : pcur;
 					double k = ((double)e.x - s.x) / ((double)e.y - s.y);
 					for (int i = s.y; i <= e.y; i++)
-						map.change((unsigned int)(s.x + ((double)i - s.y) * k), i, (mi.state == 1) ? 1 : 2);
+						map.change((int)(s.x + ((double)i - s.y) * k), i, (mi.state == 1) ? 1 : 2);
 				}
 				mi.pprev = pcur;
 			}
