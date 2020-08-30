@@ -28,13 +28,17 @@ inline void redraw() {
 
 inline void change_xpivot() {
 	WCHAR xpivot_c[16];
-	wsprintf(xpivot_c, L"%08x", xpivot);
+	if (xpivot >= 0x10000000) xpivot = 0xfffffff;
+	if (xpivot <= 0) xpivot = 0;
+	wsprintf(xpivot_c, L"%0x", xpivot);
 	theDlg.SetDlgItemText(IDC_XPIVOT, xpivot_c);
 }
 
 inline void change_ypivot() {
 	WCHAR ypivot_c[16];
-	wsprintf(ypivot_c, L"%08x", ypivot);
+	if (ypivot >= 0x10000000) ypivot = 0xfffffff;
+	if (ypivot <= 0) ypivot = 0;
+	wsprintf(ypivot_c, L"%0x", ypivot);
 	theDlg.SetDlgItemText(IDC_YPIVOT, ypivot_c);
 }
 

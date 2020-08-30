@@ -85,12 +85,12 @@ BOOL DlgOptions::OnInitDialog()
 	pScale->SendMessage(WM_SETTEXT, 0, (LPARAM)L"10");
 
 	CWnd* pSetX = GetDlgItem(IDC_XPIVOT);
-	pSetX->SendMessage(EM_SETLIMITTEXT, 10, 0);
-	pSetX->SendMessage(WM_SETTEXT, 0, (LPARAM)L"08000000");
+	pSetX->SendMessage(EM_SETLIMITTEXT, 7, 0);
+	pSetX->SendMessage(WM_SETTEXT, 0, (LPARAM)L"8000000");
 
 	CWnd* pSetY = GetDlgItem(IDC_YPIVOT);
-	pSetY->SendMessage(EM_SETLIMITTEXT, 10, 0);
-	pSetY->SendMessage(WM_SETTEXT, 0, (LPARAM)L"08000000");
+	pSetY->SendMessage(EM_SETLIMITTEXT, 7, 0);
+	pSetY->SendMessage(WM_SETTEXT, 0, (LPARAM)L"8000000");
 
 	CWnd* pClick = GetDlgItem(IDC_RADIOCLICK);
 	pClick->SendMessage(WM_LBUTTONDOWN, 0, 0);
@@ -204,18 +204,19 @@ void DlgOptions::OnChangeXpivot()
 	int len = lstrlen(xstr);
 	for (int i = 0; i < len; i++)
 		if (!((xstr[i] >= L'0' && xstr[i] <= L'9') || (xstr[i] >= L'a' && xstr[i] <= L'f'))) {
-			MessageBox(L"X Pivot should be a value ranged (0, 0x10000000)", L"Error", MB_OK);
+			MessageBox(L"A Numberal Input Required", L"Error", MB_OK);
 			return change_xpivot();
 		}
 	unsigned int x = wcstol(xstr, nullptr, 16);
-	if (x < 0x10000000 && x > 0) {
-		if (xpivot == x && len == 8) return;
+	if (x < 0x10000000 && x >= 0) {
 		xpivot = x;
+		if (xstr[0] == '\0') change_xpivot();
 	}
 	else {
-		MessageBox(L"X Pivot should be a value ranged (0, 0x10000000)", L"Error", MB_OK);
+		MessageBox(L"X Pivot should be a value in range(0, 0x10000000)", L"Error", MB_OK);
+		change_xpivot();
 	}
-	change_xpivot(), redraw();
+	redraw();
 }
 
 
@@ -226,18 +227,19 @@ void DlgOptions::OnChangeYpivot()
 	int len = lstrlen(ystr);
 	for (int i = 0; i < len; i++)
 		if (!((ystr[i] >= L'0' && ystr[i] <= L'9') || (ystr[i] >= L'a' && ystr[i] <= L'f'))) {
-			MessageBox(L"Y Pivot should be a value ranged (0, 0x10000000)", L"Error", MB_OK);
+			MessageBox(L"A Numberal Input Required", L"Error", MB_OK);
 			return change_ypivot();
 		}
 	unsigned int y = wcstol(ystr, nullptr, 16);
-	if (y < 0x10000000 && y > 0) {
-		if (ypivot == y && len == 8) return;
+	if (y < 0x10000000 && y >= 0) {
 		ypivot = y;
+		if (ystr[0] == '\0') change_ypivot();
 	}
 	else {
-		MessageBox(L"Y Pivot should be a value ranged (0, 0x10000000)", L"Error", MB_OK);
+		MessageBox(L"Y Pivot should be a value in range(0, 0x10000000)", L"Error", MB_OK);
+		change_ypivot();
 	}
-	change_ypivot(), redraw();
+	redraw();
 }
 
 
