@@ -354,7 +354,7 @@ void Map::dump(CString& fname)
 {
 	started = false;
 	CFile file;
-	if (!file.Open(fname.GetString(), CFile::modeWrite))
+	if (!file.Open(fname.GetString(), CFile::modeWrite|CFile::modeCreate))
 	{
 		theApp.m_pMainWnd->MessageBox(L"Save File Failed!", L"Error", MB_OK);
 		return;

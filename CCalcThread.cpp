@@ -55,6 +55,15 @@ BOOL CCalcThread::PreTranslateMessage(MSG* pMsg)
 		map.clear();
 		return TRUE;
 	}
+	case UM_START:
+	{
+		started = !started;
+		if (!started)
+		{
+			map.free_extra();
+		}
+		return TRUE;
+	}
 	case UM_CLOSETHREAD:
 	{
 		PostQuitMessage(0);

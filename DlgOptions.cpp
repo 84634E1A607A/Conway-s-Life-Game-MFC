@@ -155,11 +155,7 @@ void DlgOptions::OnChangeScale()
 
 void DlgOptions::OnBnClickedStartstop()
 {
-	started = !started;
-	if (!started)
-	{
-		map.free_extra();
-	}
+	pCalcThread->PostThreadMessageW(UM_START, 0, 0);
 }
 
 

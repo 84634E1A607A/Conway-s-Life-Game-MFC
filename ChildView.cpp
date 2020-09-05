@@ -335,7 +335,3 @@ void CChildView::OnLButtonUp(UINT nFlags, CPoint point)
 	mi.pprev = { 0, 0 };
 	CWnd::OnLButtonUp(nFlags, point);
 }
-
-
-
-
