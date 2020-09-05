@@ -184,6 +184,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="CAboutDlg.h" />
+    <ClInclude Include="CCalcThread.h" />
     <ClInclude Include="CHelpDlg.h" />
     <ClInclude Include="ChildView.h" />
     <ClInclude Include="DlgOptions.h" />
@@ -196,6 +197,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CCalcThread.cpp" />
     <ClCompile Include="CHelpDlg.cpp" />
     <ClCompile Include="ChildView.cpp" />
     <ClCompile Include="DlgOptions.cpp" />

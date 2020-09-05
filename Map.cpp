@@ -4,6 +4,7 @@
 #include "MainFrm.h"
 #include "ChildView.h"
 #include "DlgOptions.h"
+#include "CCalcThread.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -16,6 +17,7 @@ unsigned int selected_builtin, selected_direction, kbd_input_state, TIMER = 500;
 const unsigned int move_length = 30;
 char ids_help_about[256], ids_help_help[1024];
 extern DlgOptions theDlg;
+CWinThread* pCalcThread;
 
 
 #ifdef REALTIME_NEW
@@ -59,6 +61,7 @@ Map::Map() {
 	phead_pools = { head_pool, nullptr, nullptr };
 	pnode_pools = { nullptr, node_pool, nullptr };
 	init_builtins();
+	pCalcThread = AfxBeginThread(RUNTIME_CLASS(CCalcThread));
 }
 
 //type: {0: 1->0, 0->1; 1: 0,1->1; 2: 0,1->0}
@@ -735,6 +738,10 @@ void Map::init_builtins() {
 }
 
 Map::~Map() {
+	DWORD threadcode;
+	::GetExitCodeThread(pCalcThread->m_hThread, &threadcode);
+	if(threadcode == STILL_ACTIVE)
+		pCalcThread->PostThreadMessageW(UM_CLOSETHREAD, 0, (LPARAM)0);
 #ifdef REALTIME_NEW
 	clear(&pre);
 	clear(&cur);
@@ -763,3 +770,4 @@ Map::~Map() {
 Map map;
 AD ad;
 MOUSEINFO mi;
+

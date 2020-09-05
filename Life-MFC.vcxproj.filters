@@ -48,6 +48,9 @@
     <ClInclude Include="CAboutDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CCalcThread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Life-MFC.cpp">
@@ -69,6 +72,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CHelpDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CCalcThread.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

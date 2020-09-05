@@ -2,6 +2,7 @@
 
 //#define REALTIME_NEW
 
+
 extern int side_length;
 extern int xpivot, ypivot;
 extern bool started;
