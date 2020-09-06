@@ -27,6 +27,7 @@ BEGIN_MESSAGE_MAP(CLifeMFCApp, CWinApp)
 	ON_COMMAND(ID_OPTIONS_OPEN, &CLifeMFCApp::OnOptionsOpen)
 	ON_COMMAND(ID_OPTIONS_SAVE, &CLifeMFCApp::OnOptionsSave)
 	ON_COMMAND(ID_HELP_HELP, &CLifeMFCApp::OnHelpHelp)
+	ON_COMMAND(ID_WINDOW_NEWWINDOW, &CLifeMFCApp::OnWindowNewwindow)
 END_MESSAGE_MAP()
 
 // CLifeMFCApp construction
@@ -152,4 +153,12 @@ void CLifeMFCApp::OnHelpHelp()
 {
 	CHelpDlg helpdlg;
 	helpdlg.DoModal();
+}
+
+
+void CLifeMFCApp::OnWindowNewwindow()
+{
+	TCHAR modulename[MAX_PATH];
+	GetModuleFileName(NULL, modulename, MAX_PATH);
+	ShellExecute(NULL, TEXT("open"), modulename, NULL, NULL, SW_SHOW);
 }

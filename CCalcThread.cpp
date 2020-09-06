@@ -40,28 +40,35 @@ END_MESSAGE_MAP()
 
 BOOL CCalcThread::PreTranslateMessage(MSG* pMsg)
 {
+	
 	switch(pMsg->message)
 	{
 	case UM_NEEDDATA: 
 	{
+		theMutex.Lock();
 		map.calc();
+		theMutex.Unlock();
 		theApp.m_pMainWnd->SendMessage(UM_SENDDATA);
 		return TRUE;
 	}
 	case UM_CLEAR:
 	{
+		theMutex.Lock();
 		xpivot = ypivot = 0x08000000;
 		started = false;
 		map.clear();
+		theMutex.Unlock();
 		return TRUE;
 	}
 	case UM_START:
 	{
+		theMutex.Lock();
 		started = !started;
 		if (!started)
 		{
 			map.free_extra();
 		}
+		theMutex.Unlock();
 		return TRUE;
 	}
 	case UM_CLOSETHREAD:
@@ -72,6 +79,6 @@ BOOL CCalcThread::PreTranslateMessage(MSG* pMsg)
 	default:
 		break;
 	}
-
+	
 	return CWinThread::PreTranslateMessage(pMsg);
 }

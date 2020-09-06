@@ -60,13 +60,14 @@
 #define ID_MOVE_DOWN                    32800
 #define ID_START_STOP                   32801
 #define ID_SWITCH_WINDOW                32804
+#define ID_WINDOW_NEWWINDOW             32811
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        318
-#define _APS_NEXT_COMMAND_VALUE         32811
+#define _APS_NEXT_COMMAND_VALUE         32814
 #define _APS_NEXT_CONTROL_VALUE         1033
 #define _APS_NEXT_SYMED_VALUE           312
 #endif
