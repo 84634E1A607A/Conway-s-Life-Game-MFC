@@ -91,7 +91,7 @@ Map::head* Map::change(int xpos, int ypos, int type, head* pacceh) {
 
 void Map::calc() {
 	clock_t ts = clock();
-
+	//Sleep(10000);//test for long time calculating
 	Map::head* px = cur.pnext, *pacce = nullptr, *ptmp = nullptr;
 	while (px) {
 		Map::node* py = px->pnode->pnext;
@@ -770,4 +770,5 @@ Map::~Map() {
 Map map;
 AD ad;
 MOUSEINFO mi;
+CALCINFO ci;
 

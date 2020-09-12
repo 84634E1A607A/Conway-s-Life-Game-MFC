@@ -116,6 +116,7 @@ void CChildView::OnPaint()
 void CChildView::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	if (mi.state == 3 && !ad.adstate) return CWnd::OnLButtonDown(nFlags, point);
+	if (mi.state!=3 && ci.state == ci.busy) return CWnd::OnLButtonDown(nFlags, point);
 
 	RECT CliRect;
 	GetClientRect(&CliRect);

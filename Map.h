@@ -99,6 +99,16 @@ struct MOUSEINFO {
 	CPoint pprev = { 0, 0 };
 };
 
+struct CALCINFO {
+	enum {
+		idle,
+		busy,
+		destroyed
+	};
+	int state = idle;
+};
+
 extern Map map;
 extern AD ad;
 extern MOUSEINFO mi;
+extern CALCINFO ci;

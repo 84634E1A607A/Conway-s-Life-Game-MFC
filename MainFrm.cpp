@@ -13,6 +13,7 @@
 #endif
 
 extern CWinThread* pCalcThread;
+extern CALCINFO ci;
 
 // CMainFrame
 IMPLEMENT_DYNAMIC(CMainFrame, CFrameWnd)
@@ -34,8 +35,6 @@ END_MESSAGE_MAP()
 
 CMainFrame::CMainFrame() noexcept
 {
-	m_is_calc_finished = true;
-	m_is_calc_available = true;
 	m_hAccel = ::LoadAccelerators(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_ACCELERATOR_MAINFRM));
 }
 
@@ -114,11 +113,11 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: Add your message handler code here and/or call default
 	if (started) {
-		if (m_is_calc_available && m_is_calc_finished) {
+		if (ci.state == ci.idle) {
 			RECT rect;
 			GetClientRect(&rect);
 			m_wndView.RedrawWindow(&rect, 0, RDW_INVALIDATE);
-			m_is_calc_finished = false;
+			ci.state = ci.busy;
 			PostThreadMessage(pCalcThread->m_nThreadID,UM_NEEDDATA,0,(LPARAM)0);
 		}
 	}
@@ -165,20 +164,20 @@ void CMainFrame::OnDropFiles(HDROP hDropInfo)
 
 afx_msg LRESULT CMainFrame::OnUmSenddata(WPARAM wParam, LPARAM lParam)
 {
-	m_is_calc_finished = true;
+	ci.state = ci.idle;
 	return 0;
 }
 
 afx_msg LRESULT CMainFrame::OnUmClosethread(WPARAM wParam, LPARAM lParam)
 {
-	m_is_calc_available = false;
+	ci.state = ci.destroyed;
 	return 0;
 }
 
 
 void CMainFrame::OnClose()
 {
-	m_is_calc_available = false;
+	ci.state = ci.destroyed;
 	DWORD threadcode;
 	::GetExitCodeThread(pCalcThread->m_hThread, &threadcode);
 	if (threadcode == STILL_ACTIVE)

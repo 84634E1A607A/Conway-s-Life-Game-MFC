@@ -37,8 +37,6 @@ protected:
 	CToolBar          m_wndToolBar;
 	CChildView    m_wndView;
 	HACCEL m_hAccel;
-	bool m_is_calc_finished;
-	bool m_is_calc_available;
 
 // Generated message map functions
 protected:
