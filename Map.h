@@ -8,7 +8,6 @@ extern int xpivot, ypivot;
 extern bool started;
 extern unsigned int selected_builtin, selected_direction, kbd_input_state, TIMER;
 extern const unsigned int move_length;
-extern char ids_help_about[256], ids_help_help[1024];
 inline void redraw();
 inline void change_xpivot();
 inline void change_ypivot();
