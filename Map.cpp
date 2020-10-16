@@ -17,6 +17,7 @@ unsigned int selected_builtin, selected_direction, kbd_input_state, TIMER = 500;
 const unsigned int move_length = 30;
 char ids_help_about[256], ids_help_help[1024];
 extern DlgOptions theDlg;
+extern CMutex theMutex;
 CWinThread* pCalcThread;
 
 

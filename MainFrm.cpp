@@ -113,12 +113,12 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: Add your message handler code here and/or call default
 	if (started) {
-		if (ci.state == ci.idle) {
+		if (ci.state == CALCINFO::idle) {
 			RECT rect;
 			GetClientRect(&rect);
-			m_wndView.RedrawWindow(&rect, 0, RDW_INVALIDATE);
-			ci.state = ci.busy;
-			PostThreadMessage(pCalcThread->m_nThreadID,UM_NEEDDATA,0,(LPARAM)0);
+			m_wndView.RedrawWindow(&rect, 0, RDW_INVALIDATE|RDW_UPDATENOW);
+			ci.state = CALCINFO::busy;
+			PostThreadMessage(pCalcThread->m_nThreadID, UM_NEEDDATA, 0, (LPARAM)0);
 		}
 	}
 }
@@ -164,13 +164,13 @@ void CMainFrame::OnDropFiles(HDROP hDropInfo)
 
 afx_msg LRESULT CMainFrame::OnUmSenddata(WPARAM wParam, LPARAM lParam)
 {
-	ci.state = ci.idle;
+	ci.state = CALCINFO::idle;
 	return 0;
 }
 
 afx_msg LRESULT CMainFrame::OnUmClosethread(WPARAM wParam, LPARAM lParam)
 {
-	ci.state = ci.destroyed;
+	ci.state = CALCINFO::destroyed;
 	return 0;
 }
 

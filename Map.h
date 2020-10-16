@@ -99,11 +99,11 @@ struct MOUSEINFO {
 };
 
 struct CALCINFO {
-	enum {
+	static enum {
 		idle,
 		busy,
 		destroyed
-	};
+	}e;
 	int state = idle;
 };
 
