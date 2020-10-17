@@ -34,7 +34,6 @@ public:
 	afx_msg void OnOptionsOpen();
 	afx_msg void OnOptionsSave();
 	afx_msg void OnHelpHelp();
-	afx_msg void OnWindowNewwindow();
 };
 
 extern CLifeMFCApp theApp;

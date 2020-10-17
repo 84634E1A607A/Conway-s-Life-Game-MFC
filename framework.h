@@ -27,12 +27,6 @@
 
 #include <afxcontrolbars.h>     // MFC support for ribbons and control bars
 
-#define UM_SENDDATA WM_USER + 1
-#define UM_NEEDDATA WM_USER + 2
-#define UM_CLEAR WM_USER + 3
-#define UM_START WM_USER + 4
-#define UM_CLOSETHREAD WM_USER + 5
-
 
 
 

@@ -21,11 +21,8 @@ public:
 public:
 
 // Overrides
-protected:
+	protected:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
-
-protected:
-	bool m_is_click_available;
 
 // Implementation
 public:
@@ -54,7 +51,5 @@ public:
 	afx_msg void OnSwitchWindow();
 //	afx_msg void OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
-
-//	afx_msg void OnDestroy();
 };
 

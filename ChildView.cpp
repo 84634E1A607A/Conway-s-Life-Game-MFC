@@ -15,7 +15,6 @@
 #define new DEBUG_NEW
 #endif
 
-extern CWinThread* pClacThread;
 // CChildView
 
 CChildView::CChildView()
@@ -44,8 +43,6 @@ BEGIN_MESSAGE_MAP(CChildView, CWnd)
 	ON_COMMAND(ID_START_STOP, &CChildView::OnStartStop)
 	ON_COMMAND(ID_SWITCH_WINDOW, &CChildView::OnSwitchWindow)
 	ON_WM_LBUTTONUP()
-//	ON_MESSAGE(UM_SENDDATA, &CChildView::OnUmSenddata)
-//ON_WM_DESTROY()
 END_MESSAGE_MAP()
 
 
@@ -116,7 +113,6 @@ void CChildView::OnPaint()
 void CChildView::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	if (mi.state == 3 && !ad.adstate) return CWnd::OnLButtonDown(nFlags, point);
-	if (mi.state!=3 && ci.state == CALCINFO::busy) return CWnd::OnLButtonDown(nFlags, point);
 
 	RECT CliRect;
 	GetClientRect(&CliRect);

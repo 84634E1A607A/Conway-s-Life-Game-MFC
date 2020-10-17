@@ -2,12 +2,12 @@
 
 //#define REALTIME_NEW
 
-
 extern int side_length;
 extern int xpivot, ypivot;
 extern bool started;
 extern unsigned int selected_builtin, selected_direction, kbd_input_state, TIMER;
 extern const unsigned int move_length;
+extern char ids_help_about[256], ids_help_help[1024];
 inline void redraw();
 inline void change_xpivot();
 inline void change_ypivot();
@@ -98,16 +98,6 @@ struct MOUSEINFO {
 	CPoint pprev = { 0, 0 };
 };
 
-struct CALCINFO {
-	static enum {
-		idle,
-		busy,
-		destroyed
-	}e;
-	int state = idle;
-};
-
 extern Map map;
 extern AD ad;
 extern MOUSEINFO mi;
-extern CALCINFO ci;
