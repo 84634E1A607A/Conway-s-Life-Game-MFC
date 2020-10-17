@@ -1,9 +1,9 @@
 #include "pch.h"
-#include "Map.h"
 #include "Life-MFC.h"
 #include "MainFrm.h"
 #include "ChildView.h"
 #include "DlgOptions.h"
+#include "Map.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -59,6 +59,7 @@ Map::Map() {
 	phead_pools = { head_pool, nullptr, nullptr };
 	pnode_pools = { nullptr, node_pool, nullptr };
 	init_builtins();
+	::AfxBeginThread(&theMapProcessingThread, &data);
 }
 
 //type: {0: 1->0, 0->1; 1: 0,1->1; 2: 0,1->0}
@@ -128,7 +129,6 @@ void Map::calc() {
 }
 
 void Map::clear() {
-	Sleep(TIMER);
 	xpivot = ypivot = 0x08000000;
 #ifdef REALTIME_NEW
 	clear(&pre);
@@ -145,7 +145,6 @@ void Map::clear() {
 	for (int i = 0; i < SIZE; i++) node_pool[i].pnext = node_pool + i + 1;
 	head_pool[SIZE - 1].pnext = nullptr;  node_pool[SIZE - 1].pnext = nullptr;
 	cur.pnext = nullptr, nxt.pnext = nullptr;
-	
 	redraw();
 
 	ppool* phead = phead_pools.pnext, * pdel = phead;
@@ -758,6 +757,25 @@ Map::~Map() {
 	delete[] phead_pools.phead;
 	delete[] pnode_pools.pnode;
 #endif
+}
+
+UINT __cdecl theMapProcessingThread(LPVOID lpParameter) {
+	MapProcessingData* data = (MapProcessingData*)lpParameter;
+	CEvent& evt = data->threadEvent;
+	while (true) {
+		::WaitForSingleObject(evt.m_hObject, INFINITE);
+		switch (data->type) {
+		case t_exit: {
+			::AfxEndThread(0);
+			return 0;
+		}
+		case t_calc: {
+			map.calc();
+			data->cv->RedrawWindow(0, 0, RDW_INVALIDATE);
+			break;
+		}
+		}
+	}
 }
 
 Map map;

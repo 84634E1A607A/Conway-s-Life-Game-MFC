@@ -108,10 +108,11 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: Add your message handler code here and/or call default
 	if (started) {
-		map.calc();
-		RECT rect;
-		GetClientRect(&rect);
-		m_wndView.RedrawWindow(&rect, 0, RDW_INVALIDATE);
+		if (!map.data.cv) map.data.cv = &m_wndView;
+		map.data.type = t_calc;
+		map.data.threadEvent.SetEvent();
+		//map.calc();
+		//m_wndView.RedrawWindow(0, 0, RDW_INVALIDATE);
 	}
 }
 

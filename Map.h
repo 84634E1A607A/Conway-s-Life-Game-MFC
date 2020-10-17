@@ -11,6 +11,19 @@ extern char ids_help_about[256], ids_help_help[1024];
 inline void redraw();
 inline void change_xpivot();
 inline void change_ypivot();
+UINT __cdecl theMapProcessingThread(LPVOID lpParameter);
+
+enum jobtype {
+	t_calc,
+	t_exit
+};
+
+struct MapProcessingData {
+	CWnd* cv;
+	jobtype type;
+	CEvent threadEvent;
+	bool busy;
+};
 
 class Map {
 private:
@@ -39,6 +52,9 @@ private:
 		node* pnode;
 		ppool* pnext;
 	};
+
+public:
+	MapProcessingData data = {};
 
 private:
 	head cur;	//Current map

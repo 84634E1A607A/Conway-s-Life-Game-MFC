@@ -73,7 +73,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Life-MFC.reg" />
     <None Include="res\LifeMFC.rc2">
       <Filter>Resource Files</Filter>
     </None>
