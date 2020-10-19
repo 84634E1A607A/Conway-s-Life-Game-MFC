@@ -15,7 +15,7 @@
 #define new DEBUG_NEW
 #endif
 
-extern CWinThread* pClacThread;
+extern CWinThread* pCalcThread;
 // CChildView
 
 CChildView::CChildView()
@@ -116,7 +116,7 @@ void CChildView::OnPaint()
 void CChildView::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	if (mi.state == 3 && !ad.adstate) return CWnd::OnLButtonDown(nFlags, point);
-	if (mi.state!=3 && ci.state == CALCINFO::busy) return CWnd::OnLButtonDown(nFlags, point);
+	if (ci.state == CALCINFO::busy) return CWnd::OnLButtonDown(nFlags, point);
 
 	RECT CliRect;
 	GetClientRect(&CliRect);
@@ -151,6 +151,7 @@ void CChildView::OnLButtonDown(UINT nFlags, CPoint point)
 
 void CChildView::OnRButtonDown(UINT nFlags, CPoint point)
 {
+	if (ci.state == CALCINFO::busy) return CWnd::OnRButtonDown(nFlags, point);
 	RECT CliRect;
 	GetClientRect(&CliRect);
 	int mid_x = CliRect.right / 2, mid_y = CliRect.bottom / 2;
@@ -162,6 +163,7 @@ void CChildView::OnRButtonDown(UINT nFlags, CPoint point)
 
 void CChildView::OnMouseMove(UINT nFlags, CPoint point)
 {
+	if (ci.state == CALCINFO::busy) return CWnd::OnRButtonDown(nFlags, point);
 	if ((nFlags & MK_LBUTTON) && mi.state) {
 		RECT CliRect;
 		GetClientRect(&CliRect);
@@ -315,8 +317,7 @@ void CChildView::OnMoveDown()
 
 void CChildView::OnStartStop()
 {
-	started = !started;
-	if (!started) map.free_extra();
+	pCalcThread->PostThreadMessageW(UM_START, 0, 0);
 }
 
 

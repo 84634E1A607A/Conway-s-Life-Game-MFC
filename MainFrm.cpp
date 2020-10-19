@@ -118,7 +118,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 			GetClientRect(&rect);
 			m_wndView.RedrawWindow(&rect, 0, RDW_INVALIDATE|RDW_UPDATENOW);
 			ci.state = CALCINFO::busy;
-			PostThreadMessage(pCalcThread->m_nThreadID, UM_NEEDDATA, 0, (LPARAM)0);
+			pCalcThread->PostThreadMessageW(UM_NEEDDATA, 0, 0);
 		}
 	}
 }

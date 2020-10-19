@@ -111,3 +111,4 @@ extern Map map;
 extern AD ad;
 extern MOUSEINFO mi;
 extern CALCINFO ci;
+extern CWinThread* pCalcThread;

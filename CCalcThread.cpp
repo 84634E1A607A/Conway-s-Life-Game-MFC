@@ -69,6 +69,9 @@ BOOL CCalcThread::PreTranslateMessage(MSG* pMsg)
 			map.free_extra();
 		}
 		theMutex.Unlock();
+		RECT rect;
+		theApp.m_pMainWnd->GetClientRect(&rect);
+		theApp.m_pMainWnd->RedrawWindow(&rect, 0, RDW_INVALIDATE | RDW_UPDATENOW);
 		return TRUE;
 	}
 	case UM_CLOSETHREAD:
