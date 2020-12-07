@@ -49,11 +49,6 @@ public:
 	afx_msg void OnCreateRandom();
 	afx_msg void OnCreateRectangle();
 	afx_msg void OnDropFiles(HDROP hDropInfo);
-protected:
-	afx_msg LRESULT OnUmSenddata(WPARAM wParam, LPARAM lParam);
-	afx_msg LRESULT OnUmClosethread(WPARAM wParam, LPARAM lParam);
-public:
-	afx_msg void OnClose();
 };
 
 

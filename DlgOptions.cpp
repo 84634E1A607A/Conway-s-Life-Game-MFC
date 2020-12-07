@@ -7,7 +7,7 @@
 #include "afxdialogex.h"
 #include "Map.h"
 #include "MainFrm.h"
-#include "CCalcThread.h"
+
 extern Map map;
 extern CWinThread* pCalcThread;
 
@@ -155,13 +155,22 @@ void DlgOptions::OnChangeScale()
 
 void DlgOptions::OnBnClickedStartstop()
 {
-	pCalcThread->PostThreadMessageW(UM_START, 0, 0);
+	started = !started;
+	if (!started)
+	{
+		map.free_extra();
+	}
+	RECT rect;
+	theApp.m_pMainWnd->GetClientRect(&rect);
+	theApp.m_pMainWnd->RedrawWindow(&rect, 0, RDW_INVALIDATE | RDW_UPDATENOW);
 }
 
 
 void DlgOptions::OnBnClickedReset()
 {
-	PostThreadMessage(pCalcThread->m_nThreadID, UM_CLEAR, 0, (LPARAM)0);
+	xpivot = ypivot = 0x08000000;
+	started = false;
+	map.clear();
 }
 
 

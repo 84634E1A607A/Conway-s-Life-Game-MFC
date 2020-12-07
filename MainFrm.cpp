@@ -13,7 +13,6 @@
 #endif
 
 extern CWinThread* pCalcThread;
-extern CALCINFO ci;
 
 // CMainFrame
 IMPLEMENT_DYNAMIC(CMainFrame, CFrameWnd)
@@ -26,9 +25,6 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_CREATE_RANDOM, &CMainFrame::OnCreateRandom)
 	ON_COMMAND(ID_CREATE_RECTANGLE, &CMainFrame::OnCreateRectangle)
 	ON_WM_DROPFILES()
-	ON_MESSAGE(UM_SENDDATA, &CMainFrame::OnUmSenddata)
-	ON_MESSAGE(UM_CLOSETHREAD, &CMainFrame::OnUmClosethread)
-	ON_WM_CLOSE()
 END_MESSAGE_MAP()
 
 // CMainFrame construction/destruction
@@ -113,13 +109,12 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: Add your message handler code here and/or call default
 	if (started) {
-		if (ci.state == CALCINFO::idle) {
-			RECT rect;
-			GetClientRect(&rect);
-			m_wndView.RedrawWindow(&rect, 0, RDW_INVALIDATE|RDW_UPDATENOW);
-			ci.state = CALCINFO::busy;
-			pCalcThread->PostThreadMessageW(UM_NEEDDATA, 0, 0);
-		}
+		RECT rect;
+		GetClientRect(&rect);
+		map.calc();
+		if (headpool_usage_need_refresh) map.refresh_headpool_usage();
+		if (nodepool_usage_need_refresh) map.refresh_nodepool_usage();
+		m_wndView.RedrawWindow(&rect, 0, RDW_INVALIDATE|RDW_UPDATENOW);
 	}
 }
 
@@ -162,25 +157,5 @@ void CMainFrame::OnDropFiles(HDROP hDropInfo)
 }
 
 
-afx_msg LRESULT CMainFrame::OnUmSenddata(WPARAM wParam, LPARAM lParam)
-{
-	ci.state = CALCINFO::idle;
-	return 0;
-}
-
-afx_msg LRESULT CMainFrame::OnUmClosethread(WPARAM wParam, LPARAM lParam)
-{
-	ci.state = CALCINFO::destroyed;
-	return 0;
-}
 
 
-void CMainFrame::OnClose()
-{
-	ci.state = ci.destroyed;
-	DWORD threadcode;
-	::GetExitCodeThread(pCalcThread->m_hThread, &threadcode);
-	if (threadcode == STILL_ACTIVE)
-		pCalcThread->PostThreadMessageW(UM_CLOSETHREAD, 0, (LPARAM)0);
-	CFrameWnd::OnClose();
-}

@@ -24,8 +24,7 @@ public:
 protected:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 
-protected:
-	bool m_is_click_available;
+
 
 // Implementation
 public:
