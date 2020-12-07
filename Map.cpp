@@ -12,7 +12,7 @@
 
 int side_length = 10;
 int xpivot = 0x08000000, ypivot = 0x08000000;
-bool started;
+bool started, headpool_usage_need_refresh, nodepool_usage_need_refresh;
 unsigned int selected_builtin, selected_direction, kbd_input_state, TIMER = 500;
 const unsigned int move_length = 30;
 char ids_help_about[256], ids_help_help[1024];
@@ -423,7 +423,7 @@ Map::head* Map::enlarge_head_pool() {
 	phead_pools.pnext = nphead_pool;
 
 	headpool_usage++;
-	refresh_headpool_usage();
+	headpool_usage_need_refresh = true;
 
 	return nhead_pool;
 }
@@ -442,7 +442,7 @@ Map::node* Map::enlarge_node_pool() {
 	pnode_pools.pnext = npnode_pool;
 
 	nodepool_usage++;
-	refresh_nodepool_usage();
+	nodepool_usage_need_refresh = true;
 
 	return nnode_pool;
 }

@@ -5,7 +5,7 @@
 
 extern int side_length;
 extern int xpivot, ypivot;
-extern bool started;
+extern bool started, headpool_usage_need_refresh, nodepool_usage_need_refresh;
 extern unsigned int selected_builtin, selected_direction, kbd_input_state, TIMER;
 extern const unsigned int move_length;
 inline void redraw();
@@ -67,13 +67,12 @@ public:
 	//void dump(const char*);
 	void dump(CString&);
 	void free_extra();
-	//void trial_auto_release();
+	inline void refresh_headpool_usage();
+	inline void refresh_nodepool_usage();
 
 private:
 	head* enlarge_head_pool();
 	node* enlarge_node_pool();
-	inline void refresh_headpool_usage();
-	inline void refresh_nodepool_usage();
 	head* insert(head*);
 	node*insert(node*);
 	void del(node*);

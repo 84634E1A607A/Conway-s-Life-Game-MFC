@@ -48,6 +48,8 @@ BOOL CCalcThread::PreTranslateMessage(MSG* pMsg)
 		theMutex.Lock();
 		map.calc();
 		theMutex.Unlock();
+		if (headpool_usage_need_refresh) map.refresh_headpool_usage();
+		if (nodepool_usage_need_refresh) map.refresh_nodepool_usage();
 		theApp.m_pMainWnd->SendMessage(UM_SENDDATA);
 		return TRUE;
 	}
