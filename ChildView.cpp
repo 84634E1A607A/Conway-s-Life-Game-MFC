@@ -10,6 +10,7 @@
 #include "DlgOptions.h"
 #include "CHelpDlg.h"
 #include "CAboutDlg.h"
+#include "CCalcThread.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -194,6 +195,7 @@ void CChildView::OnMouseMove(UINT nFlags, CPoint point)
 			}
 		}
 		else mi.pprev = pcur;
+
 		RedrawWindow(nullptr, nullptr, RDW_INVALIDATE);
 	}
 	CWnd::OnMouseMove(nFlags, point);
