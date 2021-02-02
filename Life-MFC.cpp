@@ -42,6 +42,11 @@ CLifeMFCApp::CLifeMFCApp() noexcept
 	// Place all significant initialization in InitInstance
 }
 
+CLifeMFCApp::~CLifeMFCApp()
+{
+	GdiplusShutdown(m_gdiplusToken);
+}
+
 // The one and only CLifeMFCApp object
 
 CLifeMFCApp theApp;
@@ -51,6 +56,9 @@ extern DlgOptions theDlg;
 
 BOOL CLifeMFCApp::InitInstance()
 {
+	Gdiplus::GdiplusStartupOutput unused;
+	GdiplusStartup((ULONG_PTR*)&m_gdiplusToken, &gdiplusStartupInput, &unused);
+
 	CWinApp::InitInstance();
 
 

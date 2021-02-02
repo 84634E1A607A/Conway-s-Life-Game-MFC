@@ -12,7 +12,6 @@
 #define new DEBUG_NEW
 #endif
 
-extern CWinThread* pCalcThread;
 
 // CMainFrame
 IMPLEMENT_DYNAMIC(CMainFrame, CFrameWnd)
@@ -49,6 +48,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		TRACE0("Failed to create view window\n");
 		return -1;
 	}
+
 	SetTimer(1, TIMER, NULL);
 	return 0;
 }
@@ -112,8 +112,6 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 		RECT rect;
 		GetClientRect(&rect);
 		map.calc();
-		if (headpool_usage_need_refresh) map.refresh_headpool_usage();
-		if (nodepool_usage_need_refresh) map.refresh_nodepool_usage();
 		m_wndView.RedrawWindow(&rect, 0, RDW_INVALIDATE|RDW_UPDATENOW);
 	}
 }

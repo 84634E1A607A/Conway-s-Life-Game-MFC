@@ -37,10 +37,24 @@
 #define IDC_RADIOERASER                 1022
 #define IDC_ACTUALHEADPOOLSIZE          1023
 #define IDC_ACTUALNODEPOOLSIZE          1024
+#define IDC_OR                          1026
 #define IDC_SITE_GO                     1027
+#define IDC_AND                         1027
 #define IDC_SITELIST                    1028
+#define IDC_XOR                         1028
 #define IDC_HELPSTR                     1029
 #define IDC_RADIODRAG                   1031
+#define IDC_BUTTON1                     1033
+#define IDC_NEXTGEN                     1033
+#define IDC_GENERATION                  1040
+#define IDC_POPULATION                  1041
+#define IDC_SELECT                      1042
+#define IDC_CANCEL                      1045
+#define IDC_FILL                        1046
+#define IDC_RANDFILL                    1047
+#define IDC_CLEAR                       1049
+#define IDC_COPY                        1050
+#define IDC_PASTE                       1051
 #define ID_VIEW                         32772
 #define ID_VIEW_OPTIONS                 32773
 #define ID_OPTIONS_OPEN                 32776
@@ -61,14 +75,15 @@
 #define ID_START_STOP                   32801
 #define ID_SWITCH_WINDOW                32804
 #define ID_WINDOW_NEWWINDOW             32811
+#define ID_BUTTON2                      32814
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        318
-#define _APS_NEXT_COMMAND_VALUE         32814
-#define _APS_NEXT_CONTROL_VALUE         1033
+#define _APS_NEXT_RESOURCE_VALUE        321
+#define _APS_NEXT_COMMAND_VALUE         32815
+#define _APS_NEXT_CONTROL_VALUE         1072
 #define _APS_NEXT_SYMED_VALUE           312
 #endif
 #endif

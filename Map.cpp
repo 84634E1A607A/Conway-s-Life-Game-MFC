@@ -11,23 +11,24 @@
 
 int side_length = 10;
 int xpivot = 0x08000000, ypivot = 0x08000000;
-bool started, headpool_usage_need_refresh, nodepool_usage_need_refresh;
+bool started, headpool_usage_need_refresh, nodepool_usage_need_refresh, 
+	xpivot_need_refresh, ypivot_need_refresh,
+	generation_need_refresh, population_need_refresh;
 unsigned int selected_builtin, selected_direction, kbd_input_state, TIMER = 500;
 const unsigned int move_length = 30;
 char ids_help_about[256], ids_help_help[1024];
 extern DlgOptions theDlg;
-CWinThread* pCalcThread;
 
 
 #ifdef REALTIME_NEW
 unsigned int head_count, hstate, node_count, nstate;
 #endif
 
-inline void redraw() {
+void redraw() {
 	theApp.m_pMainWnd->RedrawWindow(nullptr, nullptr, RDW_INVALIDATE);
 }
 
-inline void change_xpivot() {
+void change_xpivot() {
 	WCHAR xpivot_c[16];
 	if (xpivot >= 0x10000000) xpivot = 0xfffffff;
 	if (xpivot <= 0) xpivot = 0;
@@ -35,7 +36,7 @@ inline void change_xpivot() {
 	theDlg.SetDlgItemText(IDC_XPIVOT, xpivot_c);
 }
 
-inline void change_ypivot() {
+void change_ypivot() {
 	WCHAR ypivot_c[16];
 	if (ypivot >= 0x10000000) ypivot = 0xfffffff;
 	if (ypivot <= 0) ypivot = 0;
@@ -60,6 +61,8 @@ Map::Map() {
 	phead_pools = { head_pool, nullptr, nullptr };
 	pnode_pools = { nullptr, node_pool, nullptr };
 	init_builtins();
+	generation_need_refresh = population_need_refresh = false;
+	generation = 0, population = 0;
 }
 
 //type: {0: 1->0, 0->1; 1: 0,1->1; 2: 0,1->0}
@@ -70,7 +73,7 @@ Map::head* Map::change(int xpos, int ypos, int type, head* pacceh) {
 	if (px->x == xpos && px->pnode) {
 		Map::node* py = px->pnode;
 		while (py->pnext && py->pnext->y < ypos) py = py->pnext;
-		if (py->pnext && py->pnext->y == ypos) { if (type != 1) del(py); }	//If the Map::node already exists: destroy the Map::node
+		if (py->pnext && py->pnext->y == ypos) { if (type != 1) { del(py);  } }	//If the Map::node already exists: destroy the Map::node
 		else if (type != 2) {										//If the Map::node doesn't exist: insert a Map::node
 			Map::node* pn = insert(py);
 			pn->y = ypos;
@@ -84,6 +87,7 @@ Map::head* Map::change(int xpos, int ypos, int type, head* pacceh) {
 		pnode->y = ypos;
 		pnode->state = true;
 	}
+	population_need_refresh = true;
 	return px;
 }
 
@@ -120,6 +124,8 @@ void Map::calc() {
 		px = px->pnext;
 	}
 	clear(&nxt);
+	generation += 1;
+	generation_need_refresh = true;
 	clock_t te = clock();
 	clock_t t = te - ts;
 	TCHAR s[16];
@@ -169,7 +175,13 @@ void Map::clear() {
 	headpool_usage = nodepool_usage = 1;
 	refresh_headpool_usage(), refresh_nodepool_usage();
 #endif
-	change_xpivot(), change_ypivot();
+}
+
+void Map::reset()
+{
+	clear();
+	generation = 0, population = 0;
+	generation_need_refresh = population_need_refresh = true;
 }
 
 void Map::add_builtin(const int& xpos, const int& ypos, const unsigned int& b, const unsigned int& d) {
@@ -249,6 +261,37 @@ void Map::draw(CDC& cdc, RECT& rect) {
 	}
 }
 
+void Map::draw(Graphics& graphics, RECT& rect, Gdiplus::SolidBrush& brush)
+{
+	int mid_x = rect.right / 2, mid_y = rect.bottom / 2;
+	int left = (-mid_x) / side_length + xpivot - 1, right = (rect.right - mid_x) / side_length + xpivot + 1;
+	int top = (-mid_y) / side_length + ypivot - 1, bottom = (rect.bottom - mid_y) / side_length + ypivot + 1;
+	Map::head* pl = &cur;
+	while (pl->pnext && pl->pnext->x < left) pl = pl->pnext;
+	Map::head* px = pl;
+	while (px->pnext && px->pnext->x <= right) {
+		Map::node* py = px->pnext->pnode;
+		while (py->pnext && py->pnext->y < top) py = py->pnext;
+		while (py->pnext && py->pnext->y <= bottom) {
+			//RECT fill_rect = {
+				//(LONG)((px->pnext->x - xpivot) * side_length + mid_x + 1), //left
+				//(LONG)((py->pnext->y - ypivot) * side_length + mid_y + 1), //top
+				//(LONG)((px->pnext->x - xpivot + 1) * side_length + mid_x), //right
+				//(LONG)((py->pnext->y - ypivot + 1) * side_length + mid_y)  //bottom
+			//};
+			Gdiplus::Rect fill_rect(
+				(INT)((px->pnext->x - xpivot) * side_length + mid_x + 1), //x
+				(INT)((py->pnext->y - ypivot) * side_length + mid_y + 1), //y
+				(INT)((px->pnext->x - xpivot + 1) * side_length + mid_x) - (LONG)((px->pnext->x - xpivot) * side_length + mid_x + 1), //width
+				(INT)((py->pnext->y - ypivot + 1) * side_length + mid_y) - (LONG)((py->pnext->y - ypivot) * side_length + mid_y + 1)  //height
+			);
+				graphics.FillRectangle(&brush, fill_rect);
+			py = py->pnext;
+		}
+		px = px->pnext;
+	}
+}
+
 RECT Map::get_builtin_info(int b) {
 	if (b < 0 || b > 10) return { 0, 0, 0, 0 };
 	return { 0, 0, builtins[b].length, builtins[b].height };
@@ -256,9 +299,12 @@ RECT Map::get_builtin_info(int b) {
 
 void Map::draw_builtin(CDialog* Dlg, const unsigned int& b, const unsigned int& d) {
 	//Init
-	const int xl = 71, yl = 58;
 	CWnd* hPreview = Dlg->GetDlgItem(IDC_PREVIEW);
 	if (!hPreview) return;
+	RECT ImgRect;
+	GetWindowRect(hPreview->GetSafeHwnd(), &ImgRect);
+	int xl = ImgRect.right - ImgRect.left;
+	int yl = ImgRect.bottom - ImgRect.top;
 	const builtin& bi = builtins[b];
 	CDC* dc = hPreview->GetDC();
 
@@ -447,13 +493,27 @@ Map::node* Map::enlarge_node_pool() {
 inline void Map::refresh_headpool_usage() {
 	WCHAR headpool_usage_c[8] = L"";
 	_itow_s(headpool_usage, headpool_usage_c, 10);
-	theDlg.GetDlgItem(IDC_HEADPOOL_USAGE)->SendMessage(WM_SETTEXT, 0, (LPARAM)headpool_usage_c);
+	theDlg.GetDlgItem(IDC_HEADPOOL_USAGE)->SetWindowText(headpool_usage_c);
 }
 //
 inline void Map::refresh_nodepool_usage() {
 	WCHAR nodepool_usage_c[8] = L"";
 	_itow_s(nodepool_usage, nodepool_usage_c, 10);
-	theDlg.GetDlgItem(IDC_NODEPOOL_USAGE)->SendMessage(WM_SETTEXT, 0, (LPARAM)nodepool_usage_c);
+	theDlg.GetDlgItem(IDC_NODEPOOL_USAGE)->SetWindowText(nodepool_usage_c);
+}
+
+void Map::refresh_generation()
+{
+	CString generation_str;
+	generation_str.Format(L"%d", generation);
+	theDlg.GetDlgItem(IDC_GENERATION)->SetWindowText(generation_str.GetString());
+}
+
+void Map::refresh_population()
+{
+	CString population_str;
+	population_str.Format(L"%d", population);
+	theDlg.GetDlgItem(IDC_POPULATION)->SetWindowText(population_str.GetString());
 }
 
 Map::head* Map::insert(Map::head* p) {
@@ -511,6 +571,7 @@ Map::node* Map::insert(node* p) {
 	node_pool->pnext = pn->pnext;
 	pn->pnext = p->pnext;
 	p->pnext = pn;
+	//population += 1;
 	return pn;
 #endif
 }
@@ -534,6 +595,7 @@ void Map::del(Map::node* p) {
 	node_pool->pnext = pd;
 	pd->count = pd->state = pd->y = 0;
 #endif
+	//population -= 1;
 }
 
 void Map::del(Map::head* h) {

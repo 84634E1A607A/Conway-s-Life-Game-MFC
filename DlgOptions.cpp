@@ -9,11 +9,9 @@
 #include "MainFrm.h"
 
 extern Map map;
-extern CWinThread* pCalcThread;
 
 // DlgOptions dialog
 DlgOptions theDlg;
-CMutex theMutex;
 
 IMPLEMENT_DYNAMIC(DlgOptions, CDialogEx)
 
@@ -53,6 +51,15 @@ BEGIN_MESSAGE_MAP(DlgOptions, CDialogEx)
 	ON_BN_CLICKED(IDC_RADIOERASER, &DlgOptions::OnBnClickedRadioeraser)
 	ON_WM_PAINT()
 	ON_BN_CLICKED(IDC_RADIODRAG, &DlgOptions::OnBnClickedRadiodrag)
+	ON_WM_TIMER()
+	ON_BN_CLICKED(IDC_SELECT, &DlgOptions::OnBnClickedSelect)
+	ON_BN_CLICKED(IDC_CANCEL, &DlgOptions::OnBnClickedCancel)
+	ON_BN_CLICKED(IDC_CLEAR, &DlgOptions::OnBnClickedClear)
+	ON_BN_CLICKED(IDC_RANDFILL, &DlgOptions::OnBnClickedRandfill)
+	ON_BN_CLICKED(IDC_FILL, &DlgOptions::OnBnClickedFill)
+	ON_BN_CLICKED(IDC_COPY, &DlgOptions::OnBnClickedCopy)
+	ON_BN_CLICKED(IDC_PASTE, &DlgOptions::OnBnClickedPaste)
+	ON_BN_CLICKED(IDC_NEXTGEN, &DlgOptions::OnBnClickedNextgen)
 END_MESSAGE_MAP()
 
 
@@ -99,6 +106,16 @@ BOOL DlgOptions::OnInitDialog()
 	pClick->SendMessage(WM_LBUTTONDOWN, 0, 0);
 	pClick->SendMessage(WM_LBUTTONUP, 0, 0);
 
+	CWnd* pGeneration = GetDlgItem(IDC_GENERATION);
+	pGeneration->SetWindowText(L"0");
+
+	CWnd* pPopulation = GetDlgItem(IDC_POPULATION);
+	pPopulation->SetWindowText(L"0");
+
+	CWnd* pOr = GetDlgItem(IDC_OR);
+	pOr->SendMessage(WM_LBUTTONDOWN, 0, 0);
+	pOr->SendMessage(WM_LBUTTONUP, 0, 0);
+
 #ifdef REALTIME_NEW
 	SetDlgItemText(IDC_HEADPOOL_SIZE, L"1");
 	SetDlgItemText(IDC_NODEPOOL_SIZE, L"1");
@@ -106,6 +123,8 @@ BOOL DlgOptions::OnInitDialog()
 	SetDlgItemText(IDC_ACTUALHEADPOOLSIZE, map.get_size());
 	SetDlgItemText(IDC_ACTUALNODEPOOLSIZE, map.get_size());
 #endif
+
+	SetTimer(2, 100, nullptr);
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 				  // EXCEPTION: OCX Property Pages should return FALSE
@@ -170,7 +189,7 @@ void DlgOptions::OnBnClickedReset()
 {
 	xpivot = ypivot = 0x08000000;
 	started = false;
-	map.clear();
+	map.reset();
 }
 
 
@@ -178,7 +197,7 @@ void DlgOptions::OnBnClickedUp()
 {
 	ypivot -= 5 * move_length / side_length;
 	redraw();
-	change_ypivot();
+	ypivot_need_refresh = true;
 }
 
 
@@ -186,7 +205,7 @@ void DlgOptions::OnBnClickedDown()
 {
 	ypivot += 5 * move_length / side_length;
 	redraw();
-	change_ypivot();
+	ypivot_need_refresh = true;
 }
 
 
@@ -194,7 +213,7 @@ void DlgOptions::OnBnClickedLeft()
 {
 	xpivot -= 5 * move_length / side_length;
 	redraw();
-	change_xpivot();
+	xpivot_need_refresh = true;
 }
 
 
@@ -202,7 +221,7 @@ void DlgOptions::OnBnClickedRight()
 {
 	xpivot += 5 * move_length / side_length;
 	redraw();
-	change_xpivot();
+	xpivot_need_refresh = true;
 }
 
 
@@ -292,3 +311,70 @@ BOOL DlgOptions::PreTranslateMessage(MSG* pMsg)
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
 
+
+
+void DlgOptions::OnTimer(UINT_PTR nIDEvent)
+{
+	if (headpool_usage_need_refresh) map.refresh_headpool_usage();
+	if (nodepool_usage_need_refresh) map.refresh_nodepool_usage();
+	if (xpivot_need_refresh) change_xpivot();
+	if (ypivot_need_refresh) change_ypivot();
+	if (generation_need_refresh) map.refresh_generation();
+	if (population_need_refresh) map.refresh_population();
+	headpool_usage_need_refresh = nodepool_usage_need_refresh
+		= xpivot_need_refresh = ypivot_need_refresh
+		= generation_need_refresh = population_need_refresh = false;
+
+	CDialogEx::OnTimer(nIDEvent);
+}
+
+
+
+
+
+void DlgOptions::OnBnClickedSelect()
+{
+	// TODO: 在此添加控件通知处理程序代码
+}
+
+
+void DlgOptions::OnBnClickedCancel()
+{
+	// TODO: 在此添加控件通知处理程序代码
+}
+
+
+void DlgOptions::OnBnClickedClear()
+{
+	// TODO: 在此添加控件通知处理程序代码
+}
+
+
+void DlgOptions::OnBnClickedRandfill()
+{
+	// TODO: 在此添加控件通知处理程序代码
+}
+
+
+void DlgOptions::OnBnClickedFill()
+{
+	// TODO: 在此添加控件通知处理程序代码
+}
+
+
+void DlgOptions::OnBnClickedCopy()
+{
+	// TODO: 在此添加控件通知处理程序代码
+}
+
+
+void DlgOptions::OnBnClickedPaste()
+{
+	// TODO: 在此添加控件通知处理程序代码
+}
+
+
+void DlgOptions::OnBnClickedNextgen()
+{
+	// TODO: 在此添加控件通知处理程序代码
+}

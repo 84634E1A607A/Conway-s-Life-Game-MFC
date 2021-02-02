@@ -10,20 +10,26 @@
 #include "DlgOptions.h"
 #include "CHelpDlg.h"
 #include "CAboutDlg.h"
-
+#include "Select.h"
+/*
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
+*/
 
-extern CWinThread* pCalcThread;
+extern DlgOptions theDlg;
 // CChildView
+ClipBoard cb;
+Selector selector(&map, &cb);
 
 CChildView::CChildView()
 {
+
 }
 
 CChildView::~CChildView()
 {
+	
 }
 
 
@@ -67,15 +73,20 @@ BOOL CChildView::PreCreateWindow(CREATESTRUCT& cs)
 
 void CChildView::OnPaint() 
 {
+	
 	extern int side_length;
 
 	clock_t ts = clock();
 
-	CPaintDC dc(this); // device context for painting
+	//static Gdiplus::SolidBrush BlackBrush(Gdiplus::Color(0, 0, 0));
+	//static Gdiplus::SolidBrush WhiteBrush(Gdiplus::Color(255, 255, 255));
+	//static Gdiplus::Pen LinePen(Gdiplus::Color(0xaa, 0xaa, 0xaa));
+	static CPen LinePen(PS_SOLID, 1, RGB(0xaa, 0xaa, 0xaa));
+	static CBrush BlackBrush(RGB(255,255,255));
+	static Pen BluePen(Color(0,100,221),2);
+	static SolidBrush TransParentBrush(Color(140, 40, 100, 221));
 
-	static HBRUSH hBlackBrush = (HBRUSH)GetStockObject(BLACK_BRUSH); //CreateSolidBrush(RGB(0x00, 0x00, 0x00));
-	static HPEN hLinePen = CreatePen(PS_SOLID, 1, RGB(0xaa, 0xaa, 0xaa));
-
+	CPaintDC dc(this);
 	CDC mdc;
 	mdc.CreateCompatibleDC(&dc);
 	CBitmap bmp;
@@ -83,12 +94,11 @@ void CChildView::OnPaint()
 	GetClientRect(&CliRect);
 	bmp.CreateCompatibleBitmap(&dc, CliRect.right, CliRect.bottom);
 	mdc.SelectObject(bmp);
-
-	mdc.SelectObject(hBlackBrush);
-	mdc.SelectObject(hLinePen);
-
+	mdc.SelectObject(LinePen);
+	
+	Graphics graphics(mdc.GetSafeHdc());
 	/*  init   */
-	mdc.FillSolidRect(&CliRect, RGB(255,255,255));
+	mdc.FillSolidRect(&CliRect, RGB(255, 255, 255));
 
 	int mid_x = CliRect.right / 2, mid_y = CliRect.bottom / 2;
 
@@ -100,22 +110,23 @@ void CChildView::OnPaint()
 
 	/*  blocks  */
 	map.draw(mdc, CliRect);
-
+	//graphics.FillRectangle(&TransParentBrush, 0, 0, 300, 300);
+	//selector.paint_rgn(CliRect, graphics, TransParentBrush, BluePen);
 	dc.BitBlt(0, 0, CliRect.right, CliRect.bottom, &mdc, 0, 0, SRCCOPY);
-	mdc.DeleteDC();
-	bmp.DeleteObject();
 	clock_t te = clock();
 	clock_t t = te - ts;
 	TCHAR s[16];
 	_itow_s(t, s, 10);
 	if (theDlg.GetSafeHwnd())
 		theDlg.SetDlgItemText(IDC_PAINT_TIME, s);
+	
 }
 
 
 void CChildView::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	if (mi.state == 3 && !ad.adstate) return CWnd::OnLButtonDown(nFlags, point);
+	
 
 	RECT CliRect;
 	GetClientRect(&CliRect);
@@ -142,6 +153,10 @@ void CChildView::OnLButtonDown(UINT nFlags, CPoint point)
 	}
 	else{
 		mi.pprev = { xc, yc };
+		if (mi.state == 4)
+		{
+			selector.select_point(point, CliRect);
+		}
 	}
 	RedrawWindow(nullptr, nullptr, RDW_INVALIDATE);
 	CWnd::OnLButtonDown(nFlags, point);
@@ -172,7 +187,7 @@ void CChildView::OnMouseMove(UINT nFlags, CPoint point)
 			if (mi.state == 3) {
 				xpivot = mi.pprev.x - xc + xpivot;
 				ypivot = mi.pprev.y - yc + ypivot;
-				change_xpivot(), change_ypivot();
+				xpivot_need_refresh = true, ypivot_need_refresh = true;
 			}
 			else {
 				{
@@ -192,7 +207,7 @@ void CChildView::OnMouseMove(UINT nFlags, CPoint point)
 		}
 		else mi.pprev = pcur;
 
-		RedrawWindow(nullptr, nullptr, RDW_INVALIDATE);
+		RedrawWindow(nullptr, nullptr, RDW_INVALIDATE|RDW_NOERASE);
 	}
 	CWnd::OnMouseMove(nFlags, point);
 }
@@ -283,7 +298,7 @@ void CChildView::OnMoveLeft()
 {
 	xpivot -= move_length / side_length;
 	RedrawWindow(nullptr, nullptr, RDW_INVALIDATE);
-	change_xpivot();
+	xpivot_need_refresh = true;
 }
 
 
@@ -292,7 +307,7 @@ void CChildView::OnMoveRight()
 {
 	xpivot += move_length / side_length;
 	RedrawWindow(nullptr, nullptr, RDW_INVALIDATE);
-	change_xpivot();
+	xpivot_need_refresh = true;
 }
 
 
@@ -301,7 +316,7 @@ void CChildView::OnMoveUp()
 {
 	ypivot -= move_length / side_length;
 	RedrawWindow(nullptr, nullptr, RDW_INVALIDATE);
-	change_ypivot();
+	ypivot_need_refresh = true;
 }
 
 
@@ -309,7 +324,7 @@ void CChildView::OnMoveDown()
 {
 	ypivot += move_length / side_length;
 	RedrawWindow(nullptr, nullptr, RDW_INVALIDATE);
-	change_ypivot();
+	ypivot_need_refresh = true;
 }
 
 

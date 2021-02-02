@@ -44,6 +44,15 @@ public:
 	afx_msg void OnPaint();
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	afx_msg void OnBnClickedRadiodrag();
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg void OnBnClickedSelect();
+	afx_msg void OnBnClickedCancel();
+	afx_msg void OnBnClickedClear();
+	afx_msg void OnBnClickedRandfill();
+	afx_msg void OnBnClickedFill();
+	afx_msg void OnBnClickedCopy();
+	afx_msg void OnBnClickedPaste();
+	afx_msg void OnBnClickedNextgen();
 };
 
 extern DlgOptions theDlg;
