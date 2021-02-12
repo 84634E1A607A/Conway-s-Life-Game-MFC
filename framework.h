@@ -27,8 +27,7 @@
 
 #include <afxcontrolbars.h>     // MFC support for ribbons and control bars
 
-#include <gdiplus.h>
-using namespace Gdiplus;
+#include <d2d1.h>
 
 
 

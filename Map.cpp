@@ -4,6 +4,7 @@
 #include "MainFrm.h"
 #include "ChildView.h"
 #include "DlgOptions.h"
+#include "d2dresources.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -261,11 +262,42 @@ void Map::draw(CDC& cdc, RECT& rect) {
 	}
 }
 
-void Map::draw(Graphics& graphics, RECT& rect, Gdiplus::SolidBrush& brush)
+//void Map::draw(Graphics& graphics, RECT& rect, Gdiplus::SolidBrush& brush)
+//{
+//	int mid_x = rect.right / 2, mid_y = rect.bottom / 2;
+//	int left = (-mid_x) / side_length + xpivot - 1, right = (rect.right - mid_x) / side_length + xpivot + 1;
+//	int top = (-mid_y) / side_length + ypivot - 1, bottom = (rect.bottom - mid_y) / side_length + ypivot + 1;
+//	Map::head* pl = &cur;
+//	while (pl->pnext && pl->pnext->x < left) pl = pl->pnext;
+//	Map::head* px = pl;
+//	while (px->pnext && px->pnext->x <= right) {
+//		Map::node* py = px->pnext->pnode;
+//		while (py->pnext && py->pnext->y < top) py = py->pnext;
+//		while (py->pnext && py->pnext->y <= bottom) {
+//			//RECT fill_rect = {
+//				//(LONG)((px->pnext->x - xpivot) * side_length + mid_x + 1), //left
+//				//(LONG)((py->pnext->y - ypivot) * side_length + mid_y + 1), //top
+//				//(LONG)((px->pnext->x - xpivot + 1) * side_length + mid_x), //right
+//				//(LONG)((py->pnext->y - ypivot + 1) * side_length + mid_y)  //bottom
+//			//};
+//			Gdiplus::Rect fill_rect(
+//				(INT)((px->pnext->x - xpivot) * side_length + mid_x + 1), //x
+//				(INT)((py->pnext->y - ypivot) * side_length + mid_y + 1), //y
+//				(INT)((px->pnext->x - xpivot + 1) * side_length + mid_x) - (LONG)((px->pnext->x - xpivot) * side_length + mid_x + 1), //width
+//				(INT)((py->pnext->y - ypivot + 1) * side_length + mid_y) - (LONG)((py->pnext->y - ypivot) * side_length + mid_y + 1)  //height
+//			);
+//				graphics.FillRectangle(&brush, fill_rect);
+//			py = py->pnext;
+//		}
+//		px = px->pnext;
+//	}
+//}
+
+void Map::draw(ID2D1HwndRenderTarget* ptheRenderTarget, int width, int height, float lnwidth)
 {
-	int mid_x = rect.right / 2, mid_y = rect.bottom / 2;
-	int left = (-mid_x) / side_length + xpivot - 1, right = (rect.right - mid_x) / side_length + xpivot + 1;
-	int top = (-mid_y) / side_length + ypivot - 1, bottom = (rect.bottom - mid_y) / side_length + ypivot + 1;
+	int mid_x = width / 2, mid_y = height / 2;
+	int left = (-mid_x) / side_length + xpivot - 1, right = (width - mid_x) / side_length + xpivot + 1;
+	int top = (-mid_y) / side_length + ypivot - 1, bottom = (height - mid_y) / side_length + ypivot + 1;
 	Map::head* pl = &cur;
 	while (pl->pnext && pl->pnext->x < left) pl = pl->pnext;
 	Map::head* px = pl;
@@ -273,19 +305,14 @@ void Map::draw(Graphics& graphics, RECT& rect, Gdiplus::SolidBrush& brush)
 		Map::node* py = px->pnext->pnode;
 		while (py->pnext && py->pnext->y < top) py = py->pnext;
 		while (py->pnext && py->pnext->y <= bottom) {
-			//RECT fill_rect = {
-				//(LONG)((px->pnext->x - xpivot) * side_length + mid_x + 1), //left
-				//(LONG)((py->pnext->y - ypivot) * side_length + mid_y + 1), //top
-				//(LONG)((px->pnext->x - xpivot + 1) * side_length + mid_x), //right
-				//(LONG)((py->pnext->y - ypivot + 1) * side_length + mid_y)  //bottom
-			//};
-			Gdiplus::Rect fill_rect(
-				(INT)((px->pnext->x - xpivot) * side_length + mid_x + 1), //x
-				(INT)((py->pnext->y - ypivot) * side_length + mid_y + 1), //y
-				(INT)((px->pnext->x - xpivot + 1) * side_length + mid_x) - (LONG)((px->pnext->x - xpivot) * side_length + mid_x + 1), //width
-				(INT)((py->pnext->y - ypivot + 1) * side_length + mid_y) - (LONG)((py->pnext->y - ypivot) * side_length + mid_y + 1)  //height
+			D2D1_RECT_F fill_rect = D2D1::RectF(
+				static_cast<float>((px->pnext->x - xpivot) * side_length + mid_x + 1 + lnwidth / 2 - 1), //left
+				static_cast<float>((py->pnext->y - ypivot) * side_length + mid_y + 1 + lnwidth / 2 - 1), //top
+				static_cast<float>((px->pnext->x - xpivot + 1) * side_length + mid_x - lnwidth / 2), //right
+				static_cast<float>((py->pnext->y - ypivot + 1) * side_length + mid_y - lnwidth / 2)  //bottom
 			);
-				graphics.FillRectangle(&brush, fill_rect);
+			ptheRenderTarget->FillRectangle(&fill_rect, pBlackBrush);
+			//cdc.FillSolidRect(&fill_rect, RGB(0, 0, 0));
 			py = py->pnext;
 		}
 		px = px->pnext;
@@ -352,7 +379,6 @@ LPCTSTR Map::get_size() {
 	_itow_s(SIZE, size, 10);
 	return size;
 }
-
 
 void Map::load(CString& fname)
 {

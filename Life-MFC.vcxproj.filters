@@ -51,6 +51,9 @@
     <ClInclude Include="Select.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="d2dresources.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Life-MFC.cpp">
@@ -77,7 +80,7 @@
     <ClCompile Include="Select.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ClipBoard.cpp">
+    <ClCompile Include="d2dresources.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

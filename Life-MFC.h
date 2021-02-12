@@ -27,8 +27,7 @@ public:
 	virtual int ExitInstance();
 
 private:
-	GdiplusStartupInput gdiplusStartupInput;
-	ULONG_PTR m_gdiplusToken = 0;
+
 // Implementation
 
 public:

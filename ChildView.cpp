@@ -11,6 +11,7 @@
 #include "CHelpDlg.h"
 #include "CAboutDlg.h"
 #include "Select.h"
+#include "d2dresources.h"
 /*
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -24,7 +25,8 @@ Selector selector(&map, &cb);
 
 CChildView::CChildView()
 {
-
+	hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &pD2DFactory);
+	CHECK_HR_NORETURN();
 }
 
 CChildView::~CChildView()
@@ -52,6 +54,9 @@ BEGIN_MESSAGE_MAP(CChildView, CWnd)
 	ON_WM_LBUTTONUP()
 //	ON_MESSAGE(UM_SENDDATA, &CChildView::OnUmSenddata)
 //ON_WM_DESTROY()
+//ON_WM_CREATE()
+//ON_WM_SIZE()
+ON_WM_SIZE()
 END_MESSAGE_MAP()
 
 
@@ -73,46 +78,76 @@ BOOL CChildView::PreCreateWindow(CREATESTRUCT& cs)
 
 void CChildView::OnPaint() 
 {
-	
+
 	extern int side_length;
 
 	clock_t ts = clock();
 
-	//static Gdiplus::SolidBrush BlackBrush(Gdiplus::Color(0, 0, 0));
-	//static Gdiplus::SolidBrush WhiteBrush(Gdiplus::Color(255, 255, 255));
-	//static Gdiplus::Pen LinePen(Gdiplus::Color(0xaa, 0xaa, 0xaa));
-	static CPen LinePen(PS_SOLID, 1, RGB(0xaa, 0xaa, 0xaa));
-	static CBrush BlackBrush(RGB(255,255,255));
-	static Pen BluePen(Color(0,100,221),2);
-	static SolidBrush TransParentBrush(Color(140, 40, 100, 221));
+	hr = CreateRes();
+	if (SUCCEEDED(hr))
+	{
+		////static Gdiplus::SolidBrush BlackBrush(Gdiplus::Color(0, 0, 0));
+		////static Gdiplus::SolidBrush WhiteBrush(Gdiplus::Color(255, 255, 255));
+		////static Gdiplus::Pen LinePen(Gdiplus::Color(0xaa, 0xaa, 0xaa));
+		//static CPen LinePen(PS_SOLID, 1, RGB(0xaa, 0xaa, 0xaa));
+		//static CBrush BlackBrush(RGB(255, 255, 255));
+		///*static Pen BluePen(Color(0,100,221),2);
+		//static SolidBrush TransParentBrush(Color(140, 40, 100, 221));*/
 
-	CPaintDC dc(this);
-	CDC mdc;
-	mdc.CreateCompatibleDC(&dc);
-	CBitmap bmp;
-	RECT CliRect;
-	GetClientRect(&CliRect);
-	bmp.CreateCompatibleBitmap(&dc, CliRect.right, CliRect.bottom);
-	mdc.SelectObject(bmp);
-	mdc.SelectObject(LinePen);
-	
-	Graphics graphics(mdc.GetSafeHdc());
-	/*  init   */
-	mdc.FillSolidRect(&CliRect, RGB(255, 255, 255));
+		//CPaintDC dc(this);
+		//CDC mdc;
+		//mdc.CreateCompatibleDC(&dc);
+		//CBitmap bmp;
+		//RECT CliRect;
+		//GetClientRect(&CliRect);
+		//bmp.CreateCompatibleBitmap(&dc, CliRect.right, CliRect.bottom);
+		//mdc.SelectObject(bmp);
+		//mdc.SelectObject(LinePen);
 
-	int mid_x = CliRect.right / 2, mid_y = CliRect.bottom / 2;
+		///*Graphics graphics(mdc.GetSafeHdc());*/
+		///*  init   */
+		//mdc.FillSolidRect(&CliRect, RGB(255, 255, 255));
 
-	/*  lines  */
-	for (int i = mid_x % side_length; i <= CliRect.right; i += side_length)
-		mdc.MoveTo(i, 0), mdc.LineTo(i, CliRect.bottom);
-	for (int i = mid_y % side_length; i <= CliRect.bottom; i += side_length)
-		mdc.MoveTo(0, i), mdc.LineTo(CliRect.right, i);
+		//int mid_x = CliRect.right / 2, mid_y = CliRect.bottom / 2;
 
-	/*  blocks  */
-	map.draw(mdc, CliRect);
-	//graphics.FillRectangle(&TransParentBrush, 0, 0, 300, 300);
-	//selector.paint_rgn(CliRect, graphics, TransParentBrush, BluePen);
-	dc.BitBlt(0, 0, CliRect.right, CliRect.bottom, &mdc, 0, 0, SRCCOPY);
+		///*  lines  */
+		//for (int i = mid_x % side_length; i <= CliRect.right; i += side_length)
+		//	mdc.MoveTo(i, 0), mdc.LineTo(i, CliRect.bottom);
+		//for (int i = mid_y % side_length; i <= CliRect.bottom; i += side_length)
+		//	mdc.MoveTo(0, i), mdc.LineTo(CliRect.right, i);
+
+		///*  blocks  */
+		//map.draw(mdc, CliRect);
+		////graphics.FillRectangle(&TransParentBrush, 0, 0, 300, 300);
+		////selector.paint_rgn(CliRect, graphics, TransParentBrush, BluePen);
+		//dc.BitBlt(0, 0, CliRect.right, CliRect.bottom, &mdc, 0, 0, SRCCOPY);
+
+		pRenderTarget->BeginDraw();
+		pRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
+		pRenderTarget->Clear(D2D1::ColorF(1,1,1));
+		D2D1_SIZE_F rtSize = pRenderTarget->GetSize();
+		int width = static_cast<int>(rtSize.width), height = static_cast<int>(rtSize.height);
+		int midx = width / 2, midy = height / 2;
+
+		float lnwidth = 0.05f * side_length;
+		for (int i = midx % side_length; i <= width; i += side_length)
+		{
+			pRenderTarget->DrawLine(D2D1::Point2F(static_cast<float>(i), 0), D2D1::Point2F(static_cast<float>(i), static_cast<float>(height)), pGrayBrush, lnwidth);
+		}
+		for (int i = midy % side_length; i <= height; i += side_length)
+		{
+			pRenderTarget->DrawLine(D2D1::Point2F(0, static_cast<float>(i)), D2D1::Point2F(static_cast<float>(width), static_cast<float>(i)), pGrayBrush, lnwidth);
+		}
+		if (SUCCEEDED(hr)) bRedrawBkgnd = false;
+		map.draw(pRenderTarget, width, height, lnwidth);
+		hr = pRenderTarget->EndDraw();
+		ValidateRect(NULL); 
+	}
+	if (hr == D2DERR_RECREATE_TARGET)
+	{
+		hr = S_OK;
+		DeleteRes();
+	}
 	clock_t te = clock();
 	clock_t t = te - ts;
 	TCHAR s[16];
@@ -120,6 +155,70 @@ void CChildView::OnPaint()
 	if (theDlg.GetSafeHwnd())
 		theDlg.SetDlgItemText(IDC_PAINT_TIME, s);
 	
+}
+
+HRESULT CChildView::CreateRes()
+{
+	hr = S_OK;
+	if (!pRenderTarget)
+	{
+		GetWindowRect(&rc);
+		hr = pD2DFactory->CreateHwndRenderTarget(
+			D2D1::RenderTargetProperties(),
+			D2D1::HwndRenderTargetProperties(
+				AfxGetApp()->GetMainWnd()->GetSafeHwnd(),
+				D2D1::SizeU(rc.right - rc.left, rc.bottom - rc.top)
+			),
+			&pRenderTarget
+		);
+
+		hr = pRenderTarget->CreateSolidColorBrush(
+			D2D1::ColorF(D2D1::ColorF::Black),
+			&pBlackBrush
+		);
+
+		hr = pRenderTarget->CreateSolidColorBrush(
+			D2D1::ColorF(0.3f, 0.3f, 0.3f),
+			&pGrayBrush
+		);
+
+		hr = pRenderTarget->CreateSolidColorBrush(
+			D2D1::ColorF(76.8f, 76.8f, 76.8f),
+			&pBkgndPen
+		);
+
+		hr = pRenderTarget->CreateSolidColorBrush(
+			D2D1::ColorF(0x00, 0x97, 0xa7, 0.5f),
+			&pSelectRectBrush
+		);
+
+		hr = pRenderTarget->CreateSolidColorBrush(
+			D2D1::ColorF(0x1a, 0x23, 0x7e),
+			&pSelectRectPen
+		);
+
+		hr = pRenderTarget->CreateSolidColorBrush(
+			D2D1::ColorF(0x66, 0xbb, 0x6a, 0.5f),
+			&pCopyBrush
+		);
+
+		pCopyPen = pSelectRectPen;
+	}
+
+	return hr;
+}
+
+void CChildView::DeleteRes()
+{
+	SAFE_RELEASE(pRenderTarget);
+	SAFE_RELEASE(pGrayBrush);
+	SAFE_RELEASE(pBlackBrush);
+	SAFE_RELEASE(pBkgndPen);
+	SAFE_RELEASE(pSelectRectBrush);
+	SAFE_RELEASE(pSelectRectPen);
+	SAFE_RELEASE(pCopyBrush);
+	//SAFE_RELEASE(pCopyPen);
+	SAFE_RELEASE(pBkgndGeometry);
 }
 
 
@@ -264,6 +363,7 @@ BOOL CChildView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 		if (i > 999) i = 999;
 		_itow_s(i, str, 10);
 		pScale->SetWindowText(str);
+		bRedrawBkgnd = true;
 	}
 	return CWnd::OnMouseWheel(nFlags, zDelta, pt);
 }
@@ -357,3 +457,27 @@ void CChildView::OnLButtonUp(UINT nFlags, CPoint point)
 	mi.pprev = { 0, 0 };
 	CWnd::OnLButtonUp(nFlags, point);
 }
+
+
+//int CChildView::OnCreate(LPCREATESTRUCT lpCreateStruct)
+//{
+//	if (CWnd::OnCreate(lpCreateStruct) == -1)
+//		return -1;
+//	
+//	return 0;
+//}
+
+
+void CChildView::OnSize(UINT nType, int cx, int cy)
+{
+	CWnd::OnSize(nType, cx, cy);
+
+	if (pRenderTarget)
+	{
+		pRenderTarget->Resize(D2D1::SizeU(cx, cy));
+	}
+	bRedrawBkgnd = true;
+}
+
+
+

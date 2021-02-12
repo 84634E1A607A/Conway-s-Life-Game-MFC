@@ -155,25 +155,35 @@ void Selector::select_point(CPoint& pt, RECT& CliRect)
 	}
 }
 
-
-
-void Selector::paint_rgn(RECT& CliRect, Graphics& g, Gdiplus::SolidBrush& brush, Gdiplus::Pen& pen)
+void Selector::get_rgn(RECT& rgnrect)
 {
-	int mid_x = CliRect.right / 2, mid_y = CliRect.bottom / 2;
-	CPoint p1, p2;
-	p1.x = min(si.p1.x, si.p2.x);
-	p1.y = min(si.p1.y, si.p2.y);
-	p2.x = max(si.p1.x, si.p2.x);
-	p2.y = max(si.p1.y, si.p2.y);
-	int left = (p1.x - xpivot) * side_length + mid_x;
-	int top = (p1.y - ypivot) * side_length + mid_y;
-	int width = (p2.x - p1.x) * side_length;
-	int height = (p2.y - p1.y) * side_length;
-
-	g.DrawRectangle(&pen, left, top, width, height);
-	g.FillRectangle(&brush, left, top, width, height);
-
+	rgnrect.left = si.p1.x;
+	rgnrect.right = si.p2.x;
+	rgnrect.top = si.p1.y;
+	rgnrect.right = si.p2.y;
 }
+
+
+
+//void Selector::paint_rgn(RECT& CliRect, Graphics& g, Gdiplus::SolidBrush& brush, Gdiplus::Pen& pen)
+//{
+//	int mid_x = CliRect.right / 2, mid_y = CliRect.bottom / 2;
+//	CPoint p1, p2;
+//	p1.x = min(si.p1.x, si.p2.x);
+//	p1.y = min(si.p1.y, si.p2.y);
+//	p2.x = max(si.p1.x, si.p2.x);
+//	p2.y = max(si.p1.y, si.p2.y);
+//	int left = (p1.x - xpivot) * side_length + mid_x;
+//	int top = (p1.y - ypivot) * side_length + mid_y;
+//	int width = (p2.x - p1.x) * side_length;
+//	int height = (p2.y - p1.y) * side_length;
+//
+//	g.DrawRectangle(&pen, left, top, width, height);
+//	g.FillRectangle(&brush, left, top, width, height);
+//
+//}
+
+
 
 void Selector::select()
 {

@@ -6,6 +6,7 @@
 #pragma once
 
 
+
 // CChildView window
 
 class CChildView : public CWnd
@@ -35,6 +36,8 @@ public:
 	// Generated message map functions
 protected:
 	afx_msg void OnPaint();
+	HRESULT CreateRes();
+	void DeleteRes();
 //	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	DECLARE_MESSAGE_MAP()
 public:
@@ -55,5 +58,8 @@ public:
 	afx_msg void OnSwitchWindow();
 //	afx_msg void OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
+//	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
+//	afx_msg void OnSize(UINT nType, int cx, int cy);
+	afx_msg void OnSize(UINT nType, int cx, int cy);
 };
 

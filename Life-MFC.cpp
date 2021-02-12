@@ -12,6 +12,7 @@
 #include "Map.h"
 #include "CHelpDlg.h"
 #include "CAboutDlg.h"
+#include "d2dresources.h"
 
 
 #ifdef _DEBUG
@@ -44,7 +45,7 @@ CLifeMFCApp::CLifeMFCApp() noexcept
 
 CLifeMFCApp::~CLifeMFCApp()
 {
-	GdiplusShutdown(m_gdiplusToken);
+	
 }
 
 // The one and only CLifeMFCApp object
@@ -56,8 +57,7 @@ extern DlgOptions theDlg;
 
 BOOL CLifeMFCApp::InitInstance()
 {
-	Gdiplus::GdiplusStartupOutput unused;
-	GdiplusStartup((ULONG_PTR*)&m_gdiplusToken, &gdiplusStartupInput, &unused);
+
 
 	CWinApp::InitInstance();
 
@@ -109,7 +109,16 @@ BOOL CLifeMFCApp::InitInstance()
 
 int CLifeMFCApp::ExitInstance()
 {
-	//TODO: handle additional resources you may have added
+	SAFE_RELEASE(pD2DFactory);
+	SAFE_RELEASE(pRenderTarget);
+	SAFE_RELEASE(pGrayBrush);
+	SAFE_RELEASE(pBlackBrush);
+	SAFE_RELEASE(pBkgndPen);
+	SAFE_RELEASE(pSelectRectBrush);
+	SAFE_RELEASE(pSelectRectPen);
+	SAFE_RELEASE(pCopyBrush);
+	//SAFE_RELEASE(pCopyPen);
+	SAFE_RELEASE(pBkgndGeometry);
 	return CWinApp::ExitInstance();
 }
 

@@ -68,7 +68,8 @@ public:
 	void add_builtin(const int&, const int&, const unsigned int& = selected_builtin, const unsigned int& = selected_direction);
 	void add_delete_region(RECT& rect, bool isadd, bool isrand);
 	void draw(CDC&, RECT&);
-	void draw(Graphics&, RECT&, Gdiplus::SolidBrush&);
+	//void draw(Graphics&, RECT&, Gdiplus::SolidBrush&);
+	void draw(ID2D1HwndRenderTarget* ptheRenderTarget, int width, int height, float lnwidth);
 	RECT get_builtin_info(int b = selected_builtin);
 	void draw_builtin(CDialog*, const unsigned int& = selected_builtin, const unsigned int& = selected_direction);
 	LPCTSTR get_size();

@@ -34,7 +34,7 @@ private:
 		int count = 0;
 	};
 private:
-	AD ad;
+	//AD ad;
 	SELECTINFO si;
 	ClipBoard* pClipboard;
 	Map* pMap;
@@ -46,14 +46,14 @@ public:
 	void activate(bool a);
 	bool is_active();
 	void select_point(CPoint& pt, RECT& CliRect);
-	void paint_rgn(RECT& CliRect, Graphics& g, Gdiplus::SolidBrush& brush, Gdiplus::Pen& pen);
+	void get_rgn(RECT& rgnrect);
+	//void paint_rgn(RECT& CliRect, Graphics& g, Gdiplus::SolidBrush& brush, Gdiplus::Pen& pen);
 	void select();
 	void unselect();
 	void add_delete_region(bool isadd,bool isrand);
 	bool copy();
 	bool paste();
 	void set_paste_style(int _style);
-private:
 	bool is_region_available();
 };
 
