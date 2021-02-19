@@ -480,10 +480,10 @@ void Map::free_extra() {
 
 
 Map::head* Map::enlarge_head_pool() {
-	Map::head* nhead_pool = new Map::head[SIZE];
-	memset(nhead_pool, 0, SIZE * sizeof(Map::head));
-	for (int i = 0; i < SIZE; i++) nhead_pool[i].pnext = &nhead_pool[i + 1];
-	nhead_pool[SIZE - 1].pnext = nullptr;
+	Map::head* nhead_pool = new Map::head[SIZE * headpool_usage];
+	memset(nhead_pool, 0, SIZE * headpool_usage * sizeof(Map::head));
+	for (int i = 0; i < SIZE * headpool_usage; i++) nhead_pool[i].pnext = &nhead_pool[i + 1];
+	nhead_pool[SIZE * headpool_usage - 1].pnext = nullptr;
 	head_pool->pnext = nhead_pool;
 
 	ppool* nphead_pool = new ppool;
@@ -491,18 +491,18 @@ Map::head* Map::enlarge_head_pool() {
 	nphead_pool->pnext = phead_pools.pnext;
 	phead_pools.pnext = nphead_pool;
 
-	headpool_usage++;
+	headpool_usage *= 2;
 	headpool_usage_need_refresh = true;
 
 	return nhead_pool;
 }
 
 Map::node* Map::enlarge_node_pool() {
-	Map::node* nnode_pool = new Map::node[SIZE];
-	memset(nnode_pool, 0, SIZE * sizeof(Map::node));
-	for (int i = 0; i < SIZE; i++) nnode_pool[i].pnext = nnode_pool + i + 1;
+	Map::node* nnode_pool = new Map::node[SIZE * nodepool_usage];
+	memset(nnode_pool, 0, SIZE * nodepool_usage * sizeof(Map::node));
+	for (int i = 0; i < SIZE * nodepool_usage; i++) nnode_pool[i].pnext = nnode_pool + i + 1;
 
-	nnode_pool[SIZE - 1].pnext = nullptr;
+	nnode_pool[SIZE * nodepool_usage - 1].pnext = nullptr;
 	node_pool->pnext = nnode_pool;
 
 	ppool* npnode_pool = new ppool;
@@ -510,7 +510,7 @@ Map::node* Map::enlarge_node_pool() {
 	npnode_pool->pnext = pnode_pools.pnext;
 	pnode_pools.pnext = npnode_pool;
 
-	nodepool_usage++;
+	nodepool_usage *= 2;
 	nodepool_usage_need_refresh = true;
 
 	return nnode_pool;
