@@ -42,6 +42,7 @@
 #define IDC_AND                         1027
 #define IDC_SITELIST                    1028
 #define IDC_XOR                         1028
+#define IDC_COVER                       1028
 #define IDC_HELPSTR                     1029
 #define IDC_RADIODRAG                   1031
 #define IDC_BUTTON1                     1033

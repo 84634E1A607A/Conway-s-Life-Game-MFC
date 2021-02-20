@@ -53,6 +53,9 @@ public:
 	afx_msg void OnBnClickedCopy();
 	afx_msg void OnBnClickedPaste();
 	afx_msg void OnBnClickedNextgen();
+	afx_msg void OnBnClickedOr();
+	afx_msg void OnBnClickedAnd();
+	afx_msg void OnBnClickedCover();
 };
 
 extern DlgOptions theDlg;

@@ -480,8 +480,8 @@ void Map::free_extra() {
 
 
 Map::head* Map::enlarge_head_pool() {
-	Map::head* nhead_pool = new Map::head[SIZE * headpool_usage];
-	memset(nhead_pool, 0, SIZE * headpool_usage * sizeof(Map::head));
+	Map::head* nhead_pool = new Map::head[SIZE * static_cast<__int64>(headpool_usage)];
+	memset(nhead_pool, 0, SIZE * static_cast<__int64>(headpool_usage) * sizeof(Map::head));
 	for (int i = 0; i < SIZE * headpool_usage; i++) nhead_pool[i].pnext = &nhead_pool[i + 1];
 	nhead_pool[SIZE * headpool_usage - 1].pnext = nullptr;
 	head_pool->pnext = nhead_pool;
@@ -498,8 +498,8 @@ Map::head* Map::enlarge_head_pool() {
 }
 
 Map::node* Map::enlarge_node_pool() {
-	Map::node* nnode_pool = new Map::node[SIZE * nodepool_usage];
-	memset(nnode_pool, 0, SIZE * nodepool_usage * sizeof(Map::node));
+	Map::node* nnode_pool = new Map::node[SIZE * static_cast<__int64>(nodepool_usage)];
+	memset(nnode_pool, 0, SIZE * static_cast<__int64>(nodepool_usage) * sizeof(Map::node));
 	for (int i = 0; i < SIZE * nodepool_usage; i++) nnode_pool[i].pnext = nnode_pool + i + 1;
 
 	nnode_pool[SIZE * nodepool_usage - 1].pnext = nullptr;

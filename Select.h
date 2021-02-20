@@ -7,11 +7,12 @@ class ClipBoard
 private:
 	Map::head* start;
 	int style;
+public:
 	enum
 	{
 		_and,
 		_or,
-		_xor
+		_cover
 	};
 public:
 	ClipBoard();
@@ -45,8 +46,10 @@ public:
 	~Selector();
 	void activate(bool a);
 	bool is_active();
-	void select_point(CPoint& pt, RECT& CliRect);
+	void select_point(CPoint& pt);
+	void convert(RECT& CliRect);
 	void get_rgn(RECT& rgnrect);
+	void get_current_select(RECT& rect);
 	//void paint_rgn(RECT& CliRect, Graphics& g, Gdiplus::SolidBrush& brush, Gdiplus::Pen& pen);
 	void select();
 	void unselect();
@@ -55,6 +58,10 @@ public:
 	bool paste();
 	void set_paste_style(int _style);
 	bool is_region_available();
+public:
+	BYTE prevstate;
 };
 
 
+extern ClipBoard cb;
+extern Selector selector;

@@ -7,6 +7,7 @@
 #include "afxdialogex.h"
 #include "Map.h"
 #include "MainFrm.h"
+#include "Select.h"
 
 extern Map map;
 
@@ -60,6 +61,9 @@ BEGIN_MESSAGE_MAP(DlgOptions, CDialogEx)
 	ON_BN_CLICKED(IDC_COPY, &DlgOptions::OnBnClickedCopy)
 	ON_BN_CLICKED(IDC_PASTE, &DlgOptions::OnBnClickedPaste)
 	ON_BN_CLICKED(IDC_NEXTGEN, &DlgOptions::OnBnClickedNextgen)
+	ON_BN_CLICKED(IDC_OR, &DlgOptions::OnBnClickedOr)
+	ON_BN_CLICKED(IDC_AND, &DlgOptions::OnBnClickedAnd)
+	ON_BN_CLICKED(IDC_COVER, &DlgOptions::OnBnClickedCover)
 END_MESSAGE_MAP()
 
 
@@ -334,47 +338,85 @@ void DlgOptions::OnTimer(UINT_PTR nIDEvent)
 
 void DlgOptions::OnBnClickedSelect()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	selector.activate(true);
+	selector.prevstate = mi.state;
+	mi.state = 4;
+	redraw();
 }
 
 
 void DlgOptions::OnBnClickedCancel()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	selector.unselect();
+	mi.state = selector.prevstate;
+	redraw();
 }
 
 
 void DlgOptions::OnBnClickedClear()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	RECT rect;
+	selector.get_rgn(rect);
+	selector.add_delete_region(false, false);
+	redraw();
 }
 
 
 void DlgOptions::OnBnClickedRandfill()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	RECT rect;
+	selector.get_rgn(rect);
+	selector.add_delete_region(true, true);
+	redraw();
 }
 
 
 void DlgOptions::OnBnClickedFill()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	RECT rect;
+	selector.get_rgn(rect);
+	selector.add_delete_region(true, false);
+	redraw();
 }
 
 
 void DlgOptions::OnBnClickedCopy()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	selector.copy();
+	redraw();
 }
 
 
 void DlgOptions::OnBnClickedPaste()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	selector.paste();
+	redraw();
 }
 
 
 void DlgOptions::OnBnClickedNextgen()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	if (!started)
+	{
+		map.calc();
+		redraw();
+	}
+}
+
+
+void DlgOptions::OnBnClickedOr()
+{
+	selector.set_paste_style(ClipBoard::_or);
+}
+
+
+void DlgOptions::OnBnClickedAnd()
+{
+	selector.set_paste_style(ClipBoard::_and);
+}
+
+
+void DlgOptions::OnBnClickedCover()
+{
+	selector.set_paste_style(ClipBoard::_cover);
 }

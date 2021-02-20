@@ -6,7 +6,7 @@
 #include "framework.h"
 #include "Life-MFC.h"
 #include "ChildView.h"
-#include "map.h"
+#include "Map.h"
 #include "DlgOptions.h"
 #include "CHelpDlg.h"
 #include "CAboutDlg.h"
@@ -20,8 +20,7 @@
 
 extern DlgOptions theDlg;
 // CChildView
-ClipBoard cb;
-Selector selector(&map, &cb);
+
 
 CChildView::CChildView()
 {
@@ -140,6 +139,28 @@ void CChildView::OnPaint()
 		}
 		if (SUCCEEDED(hr)) bRedrawBkgnd = false;
 		map.draw(pRenderTarget, width, height, lnwidth);
+		if (mi.state == 4)
+		{
+			RECT rect;
+			if (selector.is_active())
+			{
+				selector.get_current_select(rect);
+				pRenderTarget->DrawRectangle(D2D1::RectF(rect.left, rect.top, rect.right, rect.bottom), pSelectRectPen, 3 * lnwidth);
+				pRenderTarget->FillRectangle(D2D1::RectF(rect.left, rect.top, rect.right, rect.bottom), pSelectRectBrush);
+			}
+			else
+			{
+				selector.get_rgn(rect);
+				D2D1_RECT_F paintrect = D2D1::RectF(
+					(rect.left - xpivot) * side_length + midx + 1 + lnwidth / 2 - 1,
+					(rect.top - ypivot) * side_length + midy + 1 + lnwidth / 2 - 1,
+					(rect.right - xpivot + 1) * side_length + midx - lnwidth / 2,
+					(rect.bottom - ypivot + 1) * side_length + midy - lnwidth / 2
+				);
+				pRenderTarget->DrawRectangle(&paintrect, pSelectRectPen, 3 * lnwidth);
+				pRenderTarget->FillRectangle(&paintrect, pSelectRectBrush);
+			}
+		}
 		hr = pRenderTarget->EndDraw();
 		ValidateRect(NULL); 
 	}
@@ -188,12 +209,12 @@ HRESULT CChildView::CreateRes()
 		);
 
 		hr = pRenderTarget->CreateSolidColorBrush(
-			D2D1::ColorF(0x00, 0x97, 0xa7, 0.5f),
+			D2D1::ColorF(0x00 / 256.0f, 0x97 / 256.0f, 0xa7 / 256.0f, 0.5f),
 			&pSelectRectBrush
 		);
 
 		hr = pRenderTarget->CreateSolidColorBrush(
-			D2D1::ColorF(0x1a, 0x23, 0x7e),
+			D2D1::ColorF(0x1a / 256.0f, 0x23 / 256.0f, 0x7e / 256.0f),
 			&pSelectRectPen
 		);
 
@@ -231,7 +252,8 @@ void CChildView::OnLButtonDown(UINT nFlags, CPoint point)
 	GetClientRect(&CliRect);
 	int mid_x = CliRect.right / 2, mid_y = CliRect.bottom / 2;
 	int xc = (int)((point.x - mid_x + 0x1000 * side_length) / side_length - 0x1000 + xpivot), yc = (int)((point.y - mid_y + 0x1000 * side_length) / side_length - 0x1000 + ypivot);
-	map.change(xc, yc, (mi.state == 2) ? 2 : 0);
+	if (mi.state != 4)map.change(xc, yc, (mi.state == 2) ? 2 : 0);
+	selector.unselect();
 	if (ad.adstate) {
 		if (!ad.count) {
 			ad.p1.x = xc;
@@ -254,7 +276,9 @@ void CChildView::OnLButtonDown(UINT nFlags, CPoint point)
 		mi.pprev = { xc, yc };
 		if (mi.state == 4)
 		{
-			selector.select_point(point, CliRect);
+			selector.activate(true);
+			selector.select_point(point);
+			return CWnd::OnLButtonDown(nFlags, point);
 		}
 	}
 	RedrawWindow(nullptr, nullptr, RDW_INVALIDATE);
@@ -289,17 +313,24 @@ void CChildView::OnMouseMove(UINT nFlags, CPoint point)
 				xpivot_need_refresh = true, ypivot_need_refresh = true;
 			}
 			else {
+				if (mi.state == 4)
 				{
-					CPoint& s = (pcur.x <= mi.pprev.x) ? pcur : mi.pprev, & e = (s == pcur) ? mi.pprev : pcur;
-					double k = ((double)e.y - s.y) / ((double)e.x - s.x);
-					for (int i = s.x; i <= e.x; i++)
-						map.change(i, (int)(s.y + ((double)i - s.x) * k), (mi.state == 1) ? 1 : 2);
+					selector.select_point(point);
 				}
+				else
 				{
-					CPoint& s = (pcur.y <= mi.pprev.y) ? pcur : mi.pprev, & e = (s == pcur) ? mi.pprev : pcur;
-					double k = ((double)e.x - s.x) / ((double)e.y - s.y);
-					for (int i = s.y; i <= e.y; i++)
-						map.change((int)(s.x + ((double)i - s.y) * k), i, (mi.state == 1) ? 1 : 2);
+					{
+						CPoint& s = (pcur.x <= mi.pprev.x) ? pcur : mi.pprev, & e = (s == pcur) ? mi.pprev : pcur;
+						double k = ((double)e.y - s.y) / ((double)e.x - s.x);
+						for (int i = s.x; i <= e.x; i++)
+							map.change(i, (int)(s.y + ((double)i - s.x) * k), (mi.state == 1) ? 1 : 2);
+					}
+					{
+						CPoint& s = (pcur.y <= mi.pprev.y) ? pcur : mi.pprev, & e = (s == pcur) ? mi.pprev : pcur;
+						double k = ((double)e.x - s.x) / ((double)e.y - s.y);
+						for (int i = s.y; i <= e.y; i++)
+							map.change((int)(s.x + ((double)i - s.y) * k), i, (mi.state == 1) ? 1 : 2);
+					}
 				}
 				mi.pprev = pcur;
 			}
@@ -455,6 +486,15 @@ void CChildView::OnSwitchWindow()
 void CChildView::OnLButtonUp(UINT nFlags, CPoint point)
 {
 	mi.pprev = { 0, 0 };
+	if (mi.state == 4)
+	{
+		selector.select_point(point);
+		RECT rect;
+		GetClientRect(&rect);
+		selector.convert(rect);
+		selector.activate(false);
+		redraw();
+	}
 	CWnd::OnLButtonUp(nFlags, point);
 }
 

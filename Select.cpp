@@ -15,29 +15,43 @@ ClipBoard::~ClipBoard()
 bool ClipBoard::copy(RECT& rect, Map& _map)
 {
 	clear();
-	Map::head* ptrh = &_map.cur,*phnow = start;
+	Map::head* ptrh = &_map.cur,*phnow = nullptr;
+	start = new Map::head;
+	start->x = 0;
+	start->pnode = nullptr;
+	start->pnext = nullptr;
+	phnow = start;
 	Map::node* ptrn = nullptr,*pnnow = nullptr;
-	while (ptrh->x < rect.left && ptrh->pnext != nullptr);
+	while (ptrh->x < rect.left && ptrh->pnext != nullptr)ptrh = ptrh->pnext;
 	if (ptrh->x > rect.right) return false;
 	while (ptrh->x >= rect.left && ptrh->x <= rect.right && ptrh->pnext != nullptr)
 	{
 		ptrn = ptrh->pnode;
-		if (ptrn == nullptr)continue;
+		if (ptrn == nullptr)
+		{
+			ptrh = ptrh->pnext;
+			continue;
+		}
+		phnow->x = ptrh->x - rect.left;
+		phnow->pnode = new Map::node;
+		pnnow = phnow->pnode;
+		while (ptrn != nullptr)
+		{
+			while (ptrn->y < rect.top && ptrn->pnext != nullptr)ptrn = ptrn->pnext;
+			if (ptrn->y > rect.bottom)break;
+			
+			pnnow->pnext = new Map::node;
+			pnnow->y = ptrn->y - rect.top;
+			pnnow->state = ptrn->state;
+			pnnow = pnnow->pnext;
+			pnnow->pnext = nullptr;
+			ptrn = ptrn->pnext;
+		}		
 		phnow->pnext = new Map::head;
 		phnow = phnow->pnext;
 		phnow->pnext = nullptr;
 		phnow->pnode = nullptr;
-		phnow->x = ptrh->x - rect.left;
-		while (ptrn != nullptr)
-		{
-			while (ptrn->y < rect.top && ptrn->pnext != nullptr);
-			if (ptrn->y > rect.bottom)break;
-			phnow->pnode = new Map::node;
-			pnnow = phnow->pnode;
-			pnnow->pnext = nullptr;
-			pnnow->y = ptrn->y - rect.left;
-			pnnow->state = ptrn->state;
-		}
+		ptrh = ptrh->pnext;
 	}
 	return start != nullptr;
 }
@@ -49,6 +63,12 @@ bool ClipBoard::paste(RECT& rect, Map& _map)
 	Map::node* pnnow = nullptr, * pnmap = nullptr;
 	bool can_findm,can_findc;
 	
+	if (style == _cover)
+	{
+		
+		_map.add_delete_region(rect, false, false);
+	}
+
 	for (int i = 0; i <= rect.right - rect.left; i++)
 	{
 		while (phnow->pnext != nullptr && phnow->x < i) phnow = phnow->pnext;
@@ -60,8 +80,8 @@ bool ClipBoard::paste(RECT& rect, Map& _map)
 		if (phmap->pnext != nullptr) pnmap = phmap->pnode;
 		for (int j = 0; j <= rect.bottom - rect.top; j++)
 		{
-			while (pnnow != nullptr && pnnow->pnext != nullptr && pnnow->y < i) pnnow = pnnow->pnext;
-			while (pnmap != nullptr && pnmap->pnext != nullptr && pnmap->y < i + rect.top) pnmap = pnmap->pnext;
+			while (pnnow != nullptr && pnnow->pnext != nullptr && pnnow->y < j) pnnow = pnnow->pnext;
+			while (pnmap != nullptr && pnmap->pnext != nullptr && pnmap->y < j + rect.top) pnmap = pnmap->pnext;
 			can_findc = pnnow != nullptr && phnow->x == i && pnnow->y == j;
 			can_findm = pnmap != nullptr && phmap->x == i + rect.left && pnmap->y == j + rect.top;
 			switch (style)
@@ -76,9 +96,9 @@ bool ClipBoard::paste(RECT& rect, Map& _map)
 				_map.change(i + rect.left, j + rect.top, (can_findc || can_findm) ? 1 : 2, phmapprev);
 				break;
 			}
-			case _xor:
+			case _cover:
 			{
-				_map.change(i + rect.left, j + rect.top, (can_findc == can_findm) ? 1 : 2, phmapprev);
+				_map.change(i + rect.left, j + rect.top, can_findc ? 1 : 2);
 				break;
 			}
 			default:
@@ -101,7 +121,6 @@ void ClipBoard::clear()
 	auto dptrh = start,fptrh = start;
 	while (fptrh != nullptr)
 	{
-		fptrh = fptrh->pnext;
 		auto dptrn = dptrh->pnode, fptrn = fptrh->pnode;
 		while (fptrn != nullptr)
 		{
@@ -109,6 +128,7 @@ void ClipBoard::clear()
 			delete dptrn;
 			dptrn = fptrn;
 		}
+		fptrh = fptrh->pnext;
 		delete dptrh;
 		dptrh = fptrh;
 	}
@@ -139,28 +159,48 @@ bool Selector::is_active()
 	return si.is_active;
 }
 
-void Selector::select_point(CPoint& pt, RECT& CliRect)
+void Selector::select_point(CPoint& pt)
 {
 	if (!is_active())return;
-	CPoint midpt((CliRect.right-CliRect.left)/2,(CliRect.bottom-CliRect.top)/2);
+	//CPoint midpt((CliRect.right-CliRect.left)/2,(CliRect.bottom-CliRect.top)/2);
 	if (si.count == 0)
 	{
-		si.p1.x = (int)((pt.x - midpt.x + 0x1000 * side_length) / side_length - 0x1000 + xpivot), si.p1.y = (int)((si.p2.y - midpt.y + 0x1000 * side_length) / side_length - 0x1000 + ypivot);
+		//si.p1.x = (int)((pt.x - midpt.x + 0x1000 * side_length) / side_length - 0x1000 + xpivot), si.p1.y = (int)((si.p2.y - midpt.y + 0x1000 * side_length) / side_length - 0x1000 + ypivot);
+		si.p1 = pt;
 		si.count++;
 	}
 	else
 	{
-		si.p2.x = (int)((pt.x - midpt.x + 0x1000 * side_length) / side_length - 0x1000 + xpivot), si.p2.y = (int)((si.p2.y - midpt.y + 0x1000 * side_length) / side_length - 0x1000 + ypivot);
-		si.count++;
+		//si.p2.x = (int)((pt.x - midpt.x + 0x1000 * side_length) / side_length - 0x1000 + xpivot), si.p2.y = (int)((si.p2.y - midpt.y + 0x1000 * side_length) / side_length - 0x1000 + ypivot);
+		si.p2 = pt;
+		//si.count++;
 	}
+}
+
+void Selector::convert(RECT& CliRect)
+{
+	CPoint midpt((CliRect.right - CliRect.left) / 2, (CliRect.bottom - CliRect.top) / 2);
+	POINT p1 = { min(si.p1.x,si.p2.x),min(si.p1.y,si.p2.y) };
+	POINT p2 = { max(si.p1.x,si.p2.x),max(si.p1.y,si.p2.y) };
+	rect.left = (int)((p1.x - midpt.x + 0x1000 * side_length) / side_length - 0x1000 + xpivot);
+	rect.top = (int)((p1.y - midpt.y + 0x1000 * side_length) / side_length - 0x1000 + ypivot);
+	rect.right = (int)((p2.x - midpt.x + 0x1000 * side_length) / side_length - 0x1000 + ypivot);
+	rect.bottom = (int)((p2.y - midpt.y + 0x1000 * side_length) / side_length - 0x1000 + ypivot);
 }
 
 void Selector::get_rgn(RECT& rgnrect)
 {
-	rgnrect.left = si.p1.x;
-	rgnrect.right = si.p2.x;
-	rgnrect.top = si.p1.y;
-	rgnrect.right = si.p2.y;
+	rgnrect = rect;
+}
+
+void Selector::get_current_select(RECT& rect)
+{
+	RECT rc;
+	rc.left = min(si.p1.x, si.p2.x);
+	rc.right = max(si.p1.x, si.p2.x);
+	rc.top = min(si.p1.y, si.p2.y);
+	rc.bottom = max(si.p1.y, si.p2.y);
+	rect = rc;
 }
 
 
@@ -195,30 +235,26 @@ void Selector::unselect()
 {
 	rect = { 0,0,0,0 };
 	available = false;
+	si.count = 0;
+	si.p1 = { 0,0 };
+	si.p2 = { 0,0 };
 }
 
 void Selector::add_delete_region(bool isadd, bool isrand)
 {
-	if (is_region_available())
-		pMap->add_delete_region(rect, isadd, isrand);
+	pMap->add_delete_region(rect, isadd, isrand);
 }
 
 
 bool Selector::copy()
 {
-	if (is_region_available())
-	{
-		return pClipboard->copy(rect, *pMap);
-	}
+	return pClipboard->copy(rect, *pMap);
 	return false;
 }
 
 bool Selector::paste()
 {
-	if (is_region_available())
-	{
-		return pClipboard->paste(rect, *pMap);
-	}
+	return pClipboard->paste(rect, *pMap);
 	return false;
 }
 
@@ -233,3 +269,5 @@ bool Selector::is_region_available()
 }
 
 
+ClipBoard cb;
+Selector selector(&map, &cb);
