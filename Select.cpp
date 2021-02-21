@@ -142,6 +142,7 @@ Selector::Selector(Map* _map, ClipBoard* _clipboard)
 	pMap = _map;
 	pClipboard = _clipboard;
 	available = 0;
+	prevstate = 0;
 }
 
 Selector::~Selector()

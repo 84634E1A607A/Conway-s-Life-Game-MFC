@@ -6,6 +6,7 @@
 #include "framework.h"
 #include "Life-MFC.h"
 #include "ChildView.h"
+#include "MainFrm.h"
 #include "Map.h"
 #include "DlgOptions.h"
 #include "CHelpDlg.h"
@@ -19,6 +20,7 @@
 */
 
 extern DlgOptions theDlg;
+
 // CChildView
 
 
@@ -56,6 +58,8 @@ BEGIN_MESSAGE_MAP(CChildView, CWnd)
 //ON_WM_CREATE()
 //ON_WM_SIZE()
 ON_WM_SIZE()
+ON_COMMAND(ID_COPY, &CChildView::OnCopy)
+ON_COMMAND(ID_PASTE, &CChildView::OnPaste)
 END_MESSAGE_MAP()
 
 
@@ -124,7 +128,12 @@ void CChildView::OnPaint()
 		pRenderTarget->BeginDraw();
 		pRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
 		pRenderTarget->Clear(D2D1::ColorF(1,1,1));
+		
 		D2D1_SIZE_F rtSize = pRenderTarget->GetSize();
+		/*RECT tmprect;
+		HWND hStatusBar = ((CMainFrame*)AfxGetMainWnd())->GetStatusBarHWND();
+		GetWindowRect(&tmprect);
+		rtSize.height -= (tmprect.bottom - tmprect.top);*/
 		int width = static_cast<int>(rtSize.width), height = static_cast<int>(rtSize.height);
 		int midx = width / 2, midy = height / 2;
 
@@ -163,6 +172,7 @@ void CChildView::OnPaint()
 		}
 		hr = pRenderTarget->EndDraw();
 		ValidateRect(NULL); 
+
 	}
 	if (hr == D2DERR_RECREATE_TARGET)
 	{
@@ -521,3 +531,17 @@ void CChildView::OnSize(UINT nType, int cx, int cy)
 
 
 
+
+
+void CChildView::OnCopy()
+{
+	selector.copy();
+	redraw();
+}
+
+
+void CChildView::OnPaste()
+{
+	selector.paste();
+	redraw();
+}

@@ -5,6 +5,8 @@
 #define IDD_OPTIONS                     7
 #define IDD_ABOUTBOX                    100
 #define IDR_MAINFRAME                   128
+#define IDS_STATUS                      129
+#define IDS_MAIN                        130
 #define IDC_TABCTRL                     311
 #define IDD_DIALOG1                     313
 #define IDD_DIALOG2                     315
@@ -77,13 +79,15 @@
 #define ID_SWITCH_WINDOW                32804
 #define ID_WINDOW_NEWWINDOW             32811
 #define ID_BUTTON2                      32814
+#define ID_COPY                         32819
+#define ID_PASTE                        32820
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        321
-#define _APS_NEXT_COMMAND_VALUE         32815
+#define _APS_NEXT_COMMAND_VALUE         32821
 #define _APS_NEXT_CONTROL_VALUE         1072
 #define _APS_NEXT_SYMED_VALUE           312
 #endif

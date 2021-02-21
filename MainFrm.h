@@ -34,7 +34,8 @@ public:
 #endif
 
 protected:
-	CToolBar          m_wndToolBar;
+	//CToolBar          m_wndToolBar;
+	CStatusBar    m_wndStatusbar;
 	CChildView    m_wndView;
 	HACCEL m_hAccel;
 
@@ -49,6 +50,8 @@ public:
 	afx_msg void OnCreateRandom();
 	afx_msg void OnCreateRectangle();
 	afx_msg void OnDropFiles(HDROP hDropInfo);
+
+
 };
 
 

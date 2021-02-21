@@ -49,7 +49,10 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;
 	}
 
+
 	SetTimer(1, TIMER, NULL);
+
+	UpdateWindow();
 	return 0;
 }
 
@@ -153,6 +156,10 @@ void CMainFrame::OnDropFiles(HDROP hDropInfo)
 
 	CFrameWnd::OnDropFiles(hDropInfo);
 }
+
+
+
+
 
 
 

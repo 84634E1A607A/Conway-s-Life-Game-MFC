@@ -53,6 +53,8 @@ c \t\t- Show/hide Control Dialog\r\n\
 -(_) \t\t- slower\r\n\
 ctrl+o \t\t- open file\r\n\
 ctrl+s \t\t- save file\r\n\
+ctrl+c \t\t- copy\r\n\
+ctrl+v \t\t- paste\r\n\
 ctrl+h \t\t- help (this dialog)\r\n\
 Options->C/D \t- Click two points to create/delete a rectangle region\r\n\
 Find more interesting seeds in ./seeds");
